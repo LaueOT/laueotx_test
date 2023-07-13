@@ -11,6 +11,7 @@ https://www.tensorflow.org/install/pip#step-by-step_instructions
 ```
 conda create -n laueotx -c conda-forge python=3.10 poetry=1.5
 conda install -c conda-forge cudatoolkit=11.8.0 poetry
+conda activate laueotx
 poetry install
 ```
 

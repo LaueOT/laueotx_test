@@ -54,7 +54,6 @@ def common_options(f):
 
 @click.group("realdata")
 def main():
-    print("whoo")
     pass
 
 @main.command()
@@ -199,7 +198,6 @@ def resources(args):
 
 
 def analyse(n_grid,conf, mpd, index=0, test=False):
-
     from laueotx import laue_coordinate_descent
     from laueotx.utils import inversion as utils_inversion
     from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, select_indices, merge_duplicated_spots, get_sobol_grid_laue
