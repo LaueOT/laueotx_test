@@ -17,7 +17,7 @@ from laueotx import laue_math, laue_math_tensorised, laue_math_graph, assignment
 from laueotx.detector import Detector
 from laueotx.beamline import Beamline
 # from fastlaue3dnd.filenames import *
-from laueotx.filenames import get_filename_realdata_part
+from laueotx.filenames import get_filename_realdata_part,get_filename_realdata_merged
 from laueotx.grain import Grain
 from laueotx.laue_rotation import Rotation
 from tqdm.auto import trange, tqdm
@@ -56,12 +56,6 @@ def common_options(f):
 def main():
     pass
 
-@main.command()
-@common_options
-@click.argument("tasks", nargs=-1)
-def merge(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks):
-    print(tasks,'t')
-    click.echo("tasks")
 
 @main.command()
 @common_options
@@ -104,12 +98,10 @@ def compute(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fen
 
         mpd = get_peaskdata_from_config(conf, bl)
 
-        print(f'{conf=}')
-
         for index in indices:
             LOGGER.info(f'=================> running on index {index} / {str(indices)}')
             dict_out = analyse(n_grid, deepcopy(conf), mpd, index, test=False)
-            filename_out = get_filename_realdata_part(args.dir_out, tag=conf['tag'], index=index)
+            filename_out = get_filename_realdata_part(output_dir, tag=conf['tag'], index=index)
             utils_io.write_arrays(filename_out, **dict_out)
 
     # yield 0
@@ -198,6 +190,7 @@ def resources(args):
 
 
 def analyse(n_grid,conf, mpd, index=0, test=False):
+
     from laueotx import laue_coordinate_descent
     from laueotx.utils import inversion as utils_inversion
     from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, select_indices, merge_duplicated_spots, get_sobol_grid_laue
@@ -332,14 +325,6 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
     
     LOGGER.info(f'running optimization {opt_fun} with n_steps_annealing={n_iter} batch_size={batch_size}')
 
-    # print(batch_size,s_obs)
-    # print(nn_lookup_ind, lookup_pixel_size, lookup_n_pix)
-    # print(i_grn_trials, i_ang_trials, i_hkl_trials, i_det_trials)
-    # print(sample_trials.U, sample_trials.x0, sample_trials.v)
-    # print(sample_trials.Gamma, sample_trials.dn, sample_trials.d0, sample_trials.dr, sample_trials.dl, sample_trials.dh, sample_trials.lam, sig_s)
-    # print(opt_fun)
-    # print(n_iter)
-    # print(control_params)
     time_start = time.time()
     a_fit, x_fit, loss, nspot, fracin = laue_math_graph.batch_optimize_grain(n_per_batch=batch_size,
                                                                              s_target=s_obs,
@@ -388,16 +373,23 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
     return dict_out
 
 
-
-def merge(indices, args, dict_merged=None):
+@main.command()
+@common_options
+@click.argument("tasks", nargs=-1)
+def merge(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks,test=False):
+# def merge(indices, args, dict_merged=None):
     from laueotx import laue_coordinate_descent, utils_inversion
     from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, merge_duplicated_spots, apply_selections
     from laueotx.laue_rotation import get_rotation_constraint_rf
     from laueotx.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup
     from laueotx import spot_prototype_selection as prototype_selection
 
-    args = setup(args)
-    conf = utils_io.read_config(args)
+
+    args = {} # TODO: implement additional arguments from commandline using click
+    args = argparse.Namespace(**args)
+
+    # args = setup(args)
+    conf = utils_io.read_config(conf, args)
     sig_s = float(conf['noise_sigma'])
     opt_fun = conf['solver']['method_ot']
     opt_fun_single = conf['solver']['method_single']
@@ -406,7 +398,7 @@ def merge(indices, args, dict_merged=None):
     base_a, base_x, max_grain_pos, max_grain_rot = get_experimental_sample_params(conf)
     n_grains_obs = len(base_a)
 
-    fname_merged = get_filename_realdata_merged(args.dir_out, tag=conf['tag'])
+    fname_merged = get_filename_realdata_merged(output_dir, tag=conf['tag'])
     if dict_merged is None:
     
         dict_merged = {}
@@ -414,7 +406,7 @@ def merge(indices, args, dict_merged=None):
         LOGGER.info(f'=================> merging {len(indices)} parts')
         for index in LOGGER.progressbar(indices, desc='merging..', at_level='info'):
         
-            filename_out = get_filename_realdata_part(args.dir_out, tag=conf['tag'], index=index)
+            filename_out = get_filename_realdata_part(output_dir, tag=conf['tag'], index=index)
             LOGGER.debug(f'reading {index+1}/{len(indices)} {filename_out}')
 
             if not os.path.isfile(filename_out):
@@ -534,7 +526,7 @@ def merge(indices, args, dict_merged=None):
                                                            nn_lookup_data=(nn_lookup_ind, lookup_pixel_size, lookup_n_pix), 
                                                            noise_sig=sig_s, 
                                                            method=opt_fun,
-                                                           test=args.test)
+                                                           test=test)
 
 
     i_grn_global = dict_out_sinkhorn['inds_model'][0]
@@ -760,8 +752,8 @@ def fenimn_calibration(indices, output_dir, conf):
 
         # get output dir
 
-        args.dir_out = os.path.join(dir_out_root, f"det{id_det}_shift{id_shift:02d}")
-        utils_io.robust_makedirs(args.dir_out)
+        current_output_dir = os.path.join(dir_out_root, f"det{id_det}_shift{id_shift:02d}")
+        utils_io.robust_makedirs(current_output_dir)
 
         # main magic
 

@@ -226,8 +226,6 @@ def get_u_for_shifts_opt(Gammas, p_spots, id_ang):
         # u = np.array(list_u).squeeze()
         # u *= np.sign(u[:,[0]])                               
         
-        # print(u_center, cost, len(u))                 
-        # print(u)  
         um = np.mean(u, axis=0)
 
         # x_center = np.array([0,0,0])
@@ -885,17 +883,17 @@ def rotation_est_tru_match_spots_procrustes(U_est, U_tru):
     for i, Ue in enumerate(U_est):
         for j, Ut in enumerate(U_tru):
             R = orthogonal_procrustes(U_est[i], U_tru[j])[0]
-            print('-----')
-            print(R)
+            # print('-----')
+            # print(R)
             R = np.round(R)
             R[R==0]=0
-            print(R)
+            # print(R)
             U_est_rot = np.dot(U_est[i], R)
             matrix_diff[i,j] = np.linalg.norm(U_est_rot-U_tru[j], 'fro')
 
-    print(matrix_diff)
+    # print(matrix_diff)
     ir, ic = linear_sum_assignment(matrix_diff)
-    print(ir, ic)
+    # print(ir, ic)
     
     U_est_match = U_est[ir]
     U_tru_match = U_tru[ic]

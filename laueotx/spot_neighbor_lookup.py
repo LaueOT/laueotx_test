@@ -70,13 +70,10 @@ def nn_lookup_all(nn_lookup_arr, s_target, s_spot, i_ang, i_det, i_grn, pixel_si
     i_det = tf.cast(i_det, tf.int64)
 
     indices = s_spot[:,1:]/pixel_size
-    print(nn_lookup_arr,indices)
 
     indices = tf.cast(indices, tf.int64) + tf.cast(n_pix, tf.int64)//2
-    print(nn_lookup_arr,indices)
 
     indices = tf.concat([i_ang, i_det, indices], axis=-1)
-    print(nn_lookup_arr,indices)
     i_nn = tf.gather_nd(nn_lookup_arr, indices)
 
     return i_nn

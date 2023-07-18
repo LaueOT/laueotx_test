@@ -146,16 +146,12 @@ def optimize_global(s_target, nn_lookup_data, indices_mesh, params_grain, params
     return a_fit, x_fit, q_fit, inds_model, loss, s_full, aux_info
 
 
-
-
 @tf.function
 def batch_optimize_grain(n_per_batch, s_target, nn_lookup_data, indices_mesh, params_grain, params_experiment, n_iter=256, control_params=None, verb=False, opt_fun='baseline'):
-    print('batch_optimize_grain',n_per_batch, s_target, nn_lookup_data, indices_mesh, params_grain, params_experiment, n_iter, control_params, verb, opt_fun)
     # unpack input
     nn_lookup_spot_ind, nn_lookup_pix_size, nn_lookup_n_pix = nn_lookup_data
     i_grn, i_ang, i_hkl, i_det = indices_mesh
     U, x0, v = params_grain
-    print('params_grain',params_grain)
     Gamma, dn, d0, dr, dl, dh, lam, noise_sig = params_experiment
     v_unit = v/tf.linalg.norm(v, axis=1, keepdims=True)
     v_unit = v_unit[...,0]
@@ -205,14 +201,11 @@ def batch_optimize_grain(n_per_batch, s_target, nn_lookup_data, indices_mesh, pa
         # get the next batch of parameters
         U_, x0_, dn_, d0_, dr_ = next(dataset)
 
-        print('oiii')
-        print(U_, x0_, Gamma, v, dn_, d0_, dr_, dl, dh, lam, I_eye)
         # get the forward model prediction
         s_lab, p_lab, p_lam, select = fast_full_forward_lab(U_, x0_, Gamma, v, dn_, d0_, dr_, dl, dh, lam, I_eye)
 
         # select spots in the detector and wavelength range
         s_lab_select = s_lab[select]
-        print('s_lab_select',s_lab_select,s_lab,select)
 
         # get indices of these spots
         i_grn_select = tf.expand_dims(i_grn[select], axis=-1)
@@ -247,7 +240,6 @@ def batch_optimize_grain(n_per_batch, s_target, nn_lookup_data, indices_mesh, pa
         w_init = tf.einsum('bij, bj -> bi', a_init, v_lab_select)
         r_init = batch_get_r(s_lab_select, w_init, x_init, g_select, e, I_eye)
 
-        print(i_grn_select, i_ang_select, i_hkl_select, i_det_select, i_gpl_select, n_hkl)
         if opt_fun == 'baseline':
 
             i_target = nn_lookup(nn_lookup_spot_ind, s_target, s_lab_select, i_ang_select, i_det_select, i_grn_select, nn_lookup_pix_size, nn_lookup_n_pix)

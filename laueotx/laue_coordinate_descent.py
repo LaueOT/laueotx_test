@@ -1149,7 +1149,6 @@ def batch_optimize_coordinate_descent_softpart(a, x, s, v, g, s_target, consts, 
 
     return loss, x, a
 
-
 @tf.function(jit_compile=False)
 def batch_optimize_coordinate_descent_softslacks(a, x, s, v, g, s_target, consts, inds_model, lookup_data, control_params=(100, 1e-4, 0.99), n_iter=10, verb=False): 
 
@@ -1161,7 +1160,6 @@ def batch_optimize_coordinate_descent_softslacks(a, x, s, v, g, s_target, consts
     eps_init, eps_decrease, n_sig_outlier = control_params
 
     # get neighbours and other constants
-    print(s,'s')
     i_target = nn_lookup_all(nn_lookup_spot_ind, s_target, s, i_ang, i_det, i_grn, nn_lookup_pix_size, nn_lookup_n_pix)
     p = tf.gather(s_target, i_target)
     n_model, k_nn = i_target.shape
@@ -1175,8 +1173,7 @@ def batch_optimize_coordinate_descent_softslacks(a, x, s, v, g, s_target, consts
     # init variables
     w = tf.einsum('bij, bj -> bi', a, v)
     alpha_slacks = -0.5*(n_sig_outlier)**2
-    print(n_model, i_target)
-    print(nn_lookup_spot_ind, s_target, s, i_ang, i_det, i_grn, nn_lookup_pix_size, nn_lookup_n_pix)
+
     logC_outlier = tf.exp(tf.zeros((n_model, 1), dtype=tf.float64))
         
     # run loop

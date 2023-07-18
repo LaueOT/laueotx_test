@@ -159,14 +159,6 @@ class MultipleDetectors():
             # I0 = np.expand_dims(x0[0], axis=[1,2]) + np.expand_dims(sI0, axis=3) * np.expand_dims(L_lab[0], axis=2)
             I = np.expand_dims(x0, axis=[-2,-3]) + np.expand_dims(sI, axis=-1) * np.expand_dims(L_lab, axis=-2)
 
-            # print('---------------------')
-            # print('D',D.shape)
-            # print('N',N.shape)
-            # print('delta_x',delta_x.shape)
-            # print('x0',x0.shape)
-            # print('position',self.position.shape)
-            # print('---------------------')
-
         return I
 
     # @profile

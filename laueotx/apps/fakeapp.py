@@ -49,5 +49,4 @@ def compute(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks):
 @common_options
 @click.argument("tasks", nargs=-1)
 def merge(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks):
-    print(tasks)
     click.echo("tasks")
