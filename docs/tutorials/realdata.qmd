@@ -1,0 +1,101 @@
+---
+title: How to work with real data
+jupyter: python3
+format:
+  html:
+    code-fold: true
+    code-tools: true
+execute:
+  echo: true
+---
+
+```{python}
+#| echo: false
+#| code-fold: false
+#| output: false
+import sys, os, h5py, bz2, matplotlib.pyplot as plt, importlib, itertools
+from tqdm.auto import tqdm, trange
+from collections import OrderedDict
+from IPython.display import set_matplotlib_formats
+import seaborn
+from ipywidgets import interactive, fixed
+set_matplotlib_formats('retina')
+plt.style.use('dark_background')
+# plt.style.use('default')
+import plotting
+```
+
+## Computing files
+
+Before running the below commands make sure you have correctly installed and setup your environment.
+
+
+
+Download the dataset to `tmp` directory (create it first). From the base folder run
+
+```python
+laueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
+laueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
+laueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
+```
+
+We will be analysing the merged output of the previous commands
+
+```{python}
+#| echo: true
+#| code-fold: false
+fname = '../../results/realdata_fega10_v10_demo/analyze_sample__fega10_v10__merged.h5'
+```
+
+```{python}
+#| echo: true
+#| code-fold: false
+#| output: false
+spot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assign, s2s_mod_assign, s2s_obs_assign = plotting.load_sample(fname)
+```
+
+
+```{python}
+omegas = range(0,360,4)
+```
+
+## Plot grain statistics
+```{python}
+plotting.print_nspots_per_det(inds_obs[1], s2g_obs_assign, tag='detected ')
+plotting.print_nspots_per_det(inds_mod[1], s2g_mod_assign, tag='model    ')
+```
+
+```{python}
+#| column: screen
+plotting.plot_grain_stats_plotly(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)
+```
+
+```{python}
+#| column: screen
+plotting.plot_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)
+```
+
+## Plot prototype loss
+```{python}
+#| column: screen
+plotting.plot_spot_loss(fname, xscale='linear', yscale='linear', n_max=200)
+```
+
+## Plot spot assignment
+```{python}
+#| column: screen
+plotting.scatter_spots_assignment_per_angle_interactive(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, ia=0, omegas=omegas, color_obs='w', lw=0.5)
+```
+
+
+## Plot spot match with wavelength
+```{python}
+#| column: screen
+plotting.scatter_spots_obs_mod_per_angle_interactive(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, p_lam=p_lam, spot_mod_assign=s2g_mod_assign, ia=0, ig=0, omegas=omegas, lambda_lims=[0, 7], lam_vals=False, color_obs='w', lw=0.5)
+```
+
+## Plot match per grain
+```{python}
+#| column: screen
+plotting.scatter_spots_assignment_per_grain_interactive(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, p_lam=p_lam, s2g_mod_assign=s2g_mod_assign, s2g_obs_assign=s2g_obs_assign, ig=0, omegas=omegas, color_obs='w')
+```

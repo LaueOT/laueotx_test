@@ -21,6 +21,7 @@ from laueotx.filenames import get_filename_realdata_part,get_filename_realdata_m
 from laueotx.grain import Grain
 from laueotx.laue_rotation import Rotation
 from tqdm.auto import trange, tqdm
+from pathlib import Path 
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 warnings.filterwarnings('ignore', category=RuntimeWarning)
@@ -56,11 +57,29 @@ def common_options(f):
 def main():
     pass
 
-
 @main.command()
 @common_options
 @click.argument("tasks", nargs=-1)
-def compute(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fenimn,tasks):
+def compute(conf: str | Path, output_dir: str, verbosity: bool, n_grid: int, calibrate_coniga: bool, calibrate_fenimn: bool,tasks: list):
+    """Compute the main algorithm
+
+    Parameters
+    ----------
+    conf : str | Path
+        Path to the configuration file
+    output_dir : str
+        Path to the output directory to store the (intermediate) results
+    verbosity : bool
+        Verbosity level for printing to console
+    n_grid : int
+        _description_
+    calibrate_coniga : bool
+        _description_
+    calibrate_fenimn : bool
+        _description_
+    tasks : list
+        _description_
+    """
     indices = [int(i) for i in tasks]
 
 

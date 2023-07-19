@@ -6,8 +6,8 @@ We recommend to use miniconda to create a virtual environment for your project. 
 
 ```
 conda create -n laueotx -c conda-forge python=3.10 poetry=1.5
-conda install -c conda-forge cudatoolkit=11.8.0 poetry
 conda activate laueotx
+conda install -c conda-forge cudatoolkit=11.8.0
 poetry install
 ```
 
