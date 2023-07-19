@@ -3,7 +3,7 @@ import os, sys, warnings, argparse, h5py, numpy as np, time, itertools, random, 
 # tensorflow imports and settings
 import tensorflow as tf
 tf.config.set_soft_device_placement(False)
-tf.config.run_functions_eagerly(False)
+tf.config.run_functions_eagerly(True)
 physical_devices = tf.config.list_physical_devices('GPU')
 print(physical_devices)
 tf.debugging.set_log_device_placement(False)
@@ -190,7 +190,6 @@ def resources(args):
 
 
 def analyse(n_grid,conf, mpd, index=0, test=False):
-
     from laueotx import laue_coordinate_descent
     from laueotx.utils import inversion as utils_inversion
     from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, select_indices, merge_duplicated_spots, get_sobol_grid_laue
@@ -376,14 +375,19 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
 @main.command()
 @common_options
 @click.argument("tasks", nargs=-1)
-def merge(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks,test=False):
-# def merge(indices, args, dict_merged=None):
-    from laueotx import laue_coordinate_descent, utils_inversion
+# TODO: create a CLI parameter for test, dict_merged if necessary or remove
+def merge(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fenimn,tasks,test=False,dict_merged = None): 
+    from laueotx import laue_coordinate_descent
+    from laueotx.utils import inversion as utils_inversion
     from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, merge_duplicated_spots, apply_selections
     from laueotx.laue_rotation import get_rotation_constraint_rf
     from laueotx.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup
     from laueotx import spot_prototype_selection as prototype_selection
+    from laueotx.laue_rotation import Rotation
 
+    indices = [int(task) for task in tasks]
+
+    print(indices)
 
     args = {} # TODO: implement additional arguments from commandline using click
     args = argparse.Namespace(**args)
@@ -469,7 +473,7 @@ def merge(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks,tes
     lookup_n_pix = np.array(dict_merged['lookup_n_pix'])[...]
 
     # remove duplicated candidates
-    a_accept, x_accept, l_accept, grain_accept, spot_obs_assign, spot_mod_assign, spot_loss = assignments.prototype_selection_spot(conf=utils_io.read_config(args), 
+    a_accept, x_accept, l_accept, grain_accept, spot_obs_assign, spot_mod_assign, spot_loss = assignments.prototype_selection_spot(conf=deepcopy(conf), 
                                                                                                                                    s_target=s_target, 
                                                                                                                                    a_est=a_est, 
                                                                                                                                    x_est=x_est, 
@@ -488,7 +492,7 @@ def merge(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks,tes
     # get the sample
 
     LOGGER.info(f'getting spots for {n_accept} best candidate grains')
-    sample = polycrystalline_sample(conf=utils_io.read_config(args), hkl_sign_redundancy=True, rotation_type='mrp', restrict_fitting_area=False)
+    sample = polycrystalline_sample(conf=deepcopy(conf), hkl_sign_redundancy=True, rotation_type='mrp', restrict_fitting_area=False)
     sample.set_tensor_variables(a_accept, x_accept) 
     i_grn, i_ang, i_hkl, i_det, i_all = sample.get_batch_indices_full(n_grn=n_accept)
     s_sample, p_sample, p_lam, select_sample = sample.get_spots_batch(reference_frame='laboratory', n_per_batch=n_accept)
@@ -572,7 +576,6 @@ def merge(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks,tes
     for i in range(n_accept):
         print(f'found model grain {i+1:>4d}/{n_accept}   a={astr(a_global[i])}   x={astr(x_global[i])}')
 
-    from laueotx.laue_rotation import Rotation
     R_global = Rotation.from_mrp(a_global)
     a_rf = Rotation.as_rodrigues_frank(R_global)
 

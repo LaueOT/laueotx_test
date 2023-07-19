@@ -5,16 +5,15 @@ import tensorflow as tf
 
 from collections import OrderedDict
 from laueotx.utils import logging as utils_logging
-from laueotx.utils import io as utils_io
-from laueotx.utils import config as utils_config
-from laueotx import laue_math, laue_math_tensorised, rodrigues_space
-from laueotx.detector import Detector
-from laueotx.beamline import Beamline
-from laueotx.peaks_data import PeaksData
-from laueotx.filenames import *
-from laueotx.grain import Grain
-from tqdm.auto import trange, tqdm
-from laueotx.laue_math_tensorised import fast_full_forward, fast_spot_select
+# from laueotx.utils import io as utils_io
+# from laueotx.utils import config as utils_config
+# from laueotx import laue_math, laue_math_tensorised, rodrigues_space
+# from laueotx.detector import Detector
+# from laueotx.beamline import Beamline
+# from laueotx.peaks_data import PeaksData
+# from laueotx.filenames import *
+# from laueotx.grain import Grain
+# from laueotx.laue_math_tensorised import fast_full_forward, fast_spot_select
 from laueotx.config import TF_FUNCTION_JIT_COMPILE
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)

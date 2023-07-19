@@ -1,10 +1,5 @@
 import numpy as np
 from tqdm.auto import trange
-from laueotx.utils import config as utils_config
-from laueotx.detector import Detector
-from laueotx.beamline import Beamline
-from laueotx.grain import Grain
-from laueotx import rodrigues_space, laue_math
 import tensorflow as tf
 from laueotx.spot_neighbor_lookup import nn_lookup, nn_lookup_dist, nn_lookup_all
 from laueotx import optimal_transport

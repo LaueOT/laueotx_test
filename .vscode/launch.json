@@ -11,6 +11,14 @@
             "module": "laueotx.apps.realdata",
             "justMyCode": true,
             "args": ["compute","0","--conf","tmp/config_realdata_fega10_v10_demo.yaml","-o", "results/realdata_fega10_v10_demo/"]
+        },
+        {
+            "name": "realdata merge",
+            "type": "python",
+            "request": "launch",
+            "module": "laueotx.apps.realdata",
+            "justMyCode": true,
+            "args": ["merge","0","1","--conf","tmp/config_realdata_fega10_v10_demo.yaml","-o", "results/realdata_fega10_v10_demo/"]
         }
     ]
 }
