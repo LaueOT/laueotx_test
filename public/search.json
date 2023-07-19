@@ -1,0 +1,163 @@
+[
+  {
+    "objectID": "tutorials/index.html",
+    "href": "tutorials/index.html",
+    "title": "Tutorials",
+    "section": "",
+    "text": "Tutorials\n\nReal data"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "laueotx docs",
+    "section": "",
+    "text": "We recommend to use miniconda to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.\nconda create -n laueotx -c conda-forge python=3.10 poetry=1.5\nconda activate laueotx\nconda install -c conda-forge cudatoolkit=11.8.0\npoetry install\nEnable GPU for your conda environment\nmkdir -p $CONDA_PREFIX/etc/conda/activate.d\necho 'CUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\necho 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\nconda activate laueotx\nIf there are issues with the GPU, please follow the instructions to install tensorflow\n\n\n\nDownload the dataset to tmp directory (create it first) and run\nlaueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000"
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "laueotx docs",
+    "section": "",
+    "text": "We recommend to use miniconda to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.\nconda create -n laueotx -c conda-forge python=3.10 poetry=1.5\nconda activate laueotx\nconda install -c conda-forge cudatoolkit=11.8.0\npoetry install\nEnable GPU for your conda environment\nmkdir -p $CONDA_PREFIX/etc/conda/activate.d\necho 'CUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\necho 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\nconda activate laueotx\nIf there are issues with the GPU, please follow the instructions to install tensorflow"
+  },
+  {
+    "objectID": "index.html#quickstart",
+    "href": "index.html#quickstart",
+    "title": "laueotx docs",
+    "section": "",
+    "text": "Download the dataset to tmp directory (create it first) and run\nlaueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000"
+  },
+  {
+    "objectID": "reference/main.html",
+    "href": "reference/main.html",
+    "title": "main",
+    "section": "",
+    "text": "main\nmain()\nmain…"
+  },
+  {
+    "objectID": "reference/preview.html",
+    "href": "reference/preview.html",
+    "title": "preview",
+    "section": "",
+    "text": "preview(ast, max_depth=999, compact=False, as_string=False)\nPrint a friendly representation of a griffe object (e.g. function, docstring)\n\n\n&gt;&gt;&gt; from quartodoc import get_object\n&gt;&gt;&gt; obj = get_object(\"quartodoc\", \"get_object\")\n&gt;&gt;&gt; preview(obj.docstring.parsed)\n ...\n&gt;&gt;&gt; preview(obj)\n ..."
+  },
+  {
+    "objectID": "reference/preview.html#examples",
+    "href": "reference/preview.html#examples",
+    "title": "preview",
+    "section": "",
+    "text": "&gt;&gt;&gt; from quartodoc import get_object\n&gt;&gt;&gt; obj = get_object(\"quartodoc\", \"get_object\")\n&gt;&gt;&gt; preview(obj.docstring.parsed)\n ...\n&gt;&gt;&gt; preview(obj)\n ..."
+  },
+  {
+    "objectID": "reference/get_object.html",
+    "href": "reference/get_object.html",
+    "title": "get_object",
+    "section": "",
+    "text": "get_object(path, object_name=None, parser='numpy', load_aliases=True, dynamic=False, loader=None)\nFetch a griffe object.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\npath\nstr\nAn import path to the object. This should have the form path.to.module:object. For example, quartodoc:get_object or quartodoc:MdRenderer.render.\nrequired\n\n\nobject_name\n’str\nNone’\n(Deprecated). A function name.\n\n\nparser\nstr\nA docstring parser to use.\n'numpy'\n\n\nload_aliases\n\nFor aliases that were imported from other modules, should we load that module?\nTrue\n\n\ndynamic\n\nWhether to dynamically import object. Useful if docstring is not hard-coded, but was set on object by running python code.\nFalse\n\n\n\n\n\n\npreview: print a user-friendly preview of a griffe object.\n\n\n\n&gt;&gt;&gt; get_function(\"quartodoc\", \"get_function\")\n&lt;Function('get_function', ...\n\n\n\n\n\n\nType\nDescription\n\n\n\n\ngriffe.dataclasses.Object\nabc"
+  },
+  {
+    "objectID": "reference/get_object.html#parameters",
+    "href": "reference/get_object.html#parameters",
+    "title": "get_object",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\npath\nstr\nAn import path to the object. This should have the form path.to.module:object. For example, quartodoc:get_object or quartodoc:MdRenderer.render.\nrequired\n\n\nobject_name\n’str\nNone’\n(Deprecated). A function name.\n\n\nparser\nstr\nA docstring parser to use.\n'numpy'\n\n\nload_aliases\n\nFor aliases that were imported from other modules, should we load that module?\nTrue\n\n\ndynamic\n\nWhether to dynamically import object. Useful if docstring is not hard-coded, but was set on object by running python code.\nFalse"
+  },
+  {
+    "objectID": "reference/get_object.html#see-also",
+    "href": "reference/get_object.html#see-also",
+    "title": "get_object",
+    "section": "",
+    "text": "preview: print a user-friendly preview of a griffe object."
+  },
+  {
+    "objectID": "reference/get_object.html#examples",
+    "href": "reference/get_object.html#examples",
+    "title": "get_object",
+    "section": "",
+    "text": "&gt;&gt;&gt; get_function(\"quartodoc\", \"get_function\")\n&lt;Function('get_function', ..."
+  },
+  {
+    "objectID": "reference/get_object.html#returns",
+    "href": "reference/get_object.html#returns",
+    "title": "get_object",
+    "section": "",
+    "text": "Type\nDescription\n\n\n\n\ngriffe.dataclasses.Object\nabc"
+  },
+  {
+    "objectID": "reference/realdata.compute.html",
+    "href": "reference/realdata.compute.html",
+    "title": "realdata.compute",
+    "section": "",
+    "text": "realdata.compute(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fenimn, tasks)\nCompute the main algorithm\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory to store the (intermediate) results\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\ndescription\nrequired\n\n\ncalibrate_coniga\nbool\ndescription\nrequired\n\n\ncalibrate_fenimn\nbool\ndescription\nrequired\n\n\ntasks\nlist\ndescription\nrequired"
+  },
+  {
+    "objectID": "reference/realdata.compute.html#parameters",
+    "href": "reference/realdata.compute.html#parameters",
+    "title": "realdata.compute",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory to store the (intermediate) results\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\ndescription\nrequired\n\n\ncalibrate_coniga\nbool\ndescription\nrequired\n\n\ncalibrate_fenimn\nbool\ndescription\nrequired\n\n\ntasks\nlist\ndescription\nrequired"
+  },
+  {
+    "objectID": "reference/index.html",
+    "href": "reference/index.html",
+    "title": "Function reference",
+    "section": "",
+    "text": "Real data application\n\n\n\nrealdata.compute\nCompute the main algorithm"
+  },
+  {
+    "objectID": "reference/index.html#application-functions",
+    "href": "reference/index.html#application-functions",
+    "title": "Function reference",
+    "section": "",
+    "text": "Real data application\n\n\n\nrealdata.compute\nCompute the main algorithm"
+  },
+  {
+    "objectID": "tutorials/realdata.html",
+    "href": "tutorials/realdata.html",
+    "title": "How to work with real data",
+    "section": "",
+    "text": "Before running the below commands make sure you have correctly installed and setup your environment.\nDownload the dataset to tmp directory (create it first). From the base folder run\nlaueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nWe will be analysing the merged output of the previous commands\n\nfname = '../../results/realdata_fega10_v10_demo/analyze_sample__fega10_v10__merged.h5'\n\n\nspot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assign, s2s_mod_assign, s2s_obs_assign = plotting.load_sample(fname)\n\n\n\nCode\nomegas = range(0,360,4)"
+  },
+  {
+    "objectID": "tutorials/realdata.html#computing-files",
+    "href": "tutorials/realdata.html#computing-files",
+    "title": "How to work with real data",
+    "section": "",
+    "text": "Before running the below commands make sure you have correctly installed and setup your environment.\nDownload the dataset to tmp directory (create it first). From the base folder run\nlaueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nWe will be analysing the merged output of the previous commands\n\nfname = '../../results/realdata_fega10_v10_demo/analyze_sample__fega10_v10__merged.h5'\n\n\nspot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assign, s2s_mod_assign, s2s_obs_assign = plotting.load_sample(fname)\n\n\n\nCode\nomegas = range(0,360,4)"
+  },
+  {
+    "objectID": "tutorials/realdata.html#plot-grain-statistics",
+    "href": "tutorials/realdata.html#plot-grain-statistics",
+    "title": "How to work with real data",
+    "section": "Plot grain statistics",
+    "text": "Plot grain statistics\n\n\nCode\nplotting.print_nspots_per_det(inds_obs[1], s2g_obs_assign, tag='detected ')\nplotting.print_nspots_per_det(inds_mod[1], s2g_mod_assign, tag='model    ')\n\n\nspots=detected  total      n_spots=269181 assigned  15978 [5.94%]\nspots=detected  detector=0 n_spots=197047 assigned  13174 [6.69%]\nspots=detected  detector=1 n_spots= 72134 assigned   2804 [3.89%]\nspots=model     total      n_spots= 18977 assigned  15978 [84.20%]\nspots=model     detector=0 n_spots= 15393 assigned  13174 [85.58%]\nspots=model     detector=1 n_spots=  3584 assigned   2804 [78.24%]\n\n\n\n\nCode\nplotting.plot_grain_stats_plotly(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)\n\n\nn_grains=17\n\n\n\n                                                \n\n\n\n\nCode\nplotting.plot_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)\n\n\nn_grains=17"
+  },
+  {
+    "objectID": "tutorials/realdata.html#plot-prototype-loss",
+    "href": "tutorials/realdata.html#plot-prototype-loss",
+    "title": "How to work with real data",
+    "section": "Plot prototype loss",
+    "text": "Plot prototype loss\n\n\nCode\nplotting.plot_spot_loss(fname, xscale='linear', yscale='linear', n_max=200)"
+  },
+  {
+    "objectID": "tutorials/realdata.html#plot-spot-assignment",
+    "href": "tutorials/realdata.html#plot-spot-assignment",
+    "title": "How to work with real data",
+    "section": "Plot spot assignment",
+    "text": "Plot spot assignment\n\n\nCode\nplotting.scatter_spots_assignment_per_angle_interactive(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, ia=0, omegas=omegas, color_obs='w', lw=0.5)"
+  },
+  {
+    "objectID": "tutorials/realdata.html#plot-spot-match-with-wavelength",
+    "href": "tutorials/realdata.html#plot-spot-match-with-wavelength",
+    "title": "How to work with real data",
+    "section": "Plot spot match with wavelength",
+    "text": "Plot spot match with wavelength\n\n\nCode\nplotting.scatter_spots_obs_mod_per_angle_interactive(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, p_lam=p_lam, spot_mod_assign=s2g_mod_assign, ia=0, ig=0, omegas=omegas, lambda_lims=[0, 7], lam_vals=False, color_obs='w', lw=0.5)"
+  },
+  {
+    "objectID": "tutorials/realdata.html#plot-match-per-grain",
+    "href": "tutorials/realdata.html#plot-match-per-grain",
+    "title": "How to work with real data",
+    "section": "Plot match per grain",
+    "text": "Plot match per grain\n\n\nCode\nplotting.scatter_spots_assignment_per_grain_interactive(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, p_lam=p_lam, s2g_mod_assign=s2g_mod_assign, s2g_obs_assign=s2g_obs_assign, ig=0, omegas=omegas, color_obs='w')"
+  }
+]
