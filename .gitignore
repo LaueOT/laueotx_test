@@ -163,3 +163,13 @@ cython_debug/
 
 tmp/
 results/
+
+
+/docs/.quarto/
+/docs/_site/
+
+/.quarto/
+/_site/
+
+
+/env/

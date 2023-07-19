@@ -1,9 +1,11 @@
 import click
 # from laueotx.apps.fakeapp import main as fakeapp
-from laueotx.apps.realdata import main as realdata
+from .apps import realdata # noqa
 
 @click.group()
 def main():
+    """main...
+    """
     pass
 
 # main.add_command(fakeapp)

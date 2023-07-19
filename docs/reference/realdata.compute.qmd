@@ -1,0 +1,17 @@
+# realdata.compute { #laueotx.realdata.compute }
+
+`realdata.compute(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fenimn, tasks)`
+
+Compute the main algorithm
+
+## Parameters
+
+| Name               | Type                | Description                                                      | Default    |
+|--------------------|---------------------|------------------------------------------------------------------|------------|
+| `conf`             | str \| pathlib.Path | Path to the configuration file                                   | _required_ |
+| `output_dir`       | str                 | Path to the output directory to store the (intermediate) results | _required_ |
+| `verbosity`        | bool                | Verbosity level for printing to console                          | _required_ |
+| `n_grid`           | int                 | _description_                                                    | _required_ |
+| `calibrate_coniga` | bool                | _description_                                                    | _required_ |
+| `calibrate_fenimn` | bool                | _description_                                                    | _required_ |
+| `tasks`            | list                | _description_                                                    | _required_ |

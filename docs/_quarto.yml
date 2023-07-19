@@ -1,0 +1,57 @@
+project:
+  type: website
+  output-dir: ../public
+
+website:
+  title: "laueotx docs"
+  repo-url: https://gitlab.datascience.ch/matthiasm/laueotx
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: tutorials/index.qmd
+        text: Tutorials
+      - text: Reference
+        href: reference/index.qmd
+      - text: About
+        menu:
+            - text: "Swiss Data Science Center (SDSC)"
+              href: https://datascience.ch
+              target: _blank
+            - text: "Paul Scherrer Institute (PSI)"
+              href: https://www.psi.ch/en
+              target: _blank
+
+    right:
+      - icon: git
+        href: https://gitlab.datascience.ch/matthiasm/laueotx
+        aria-label: laueotx python Gitlab
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+# tell quarto to read the generated sidebar
+metadata-files:
+  - _sidebar.yml
+
+
+quartodoc:
+  # the name used to import the package
+  package: laueotx
+
+  # write sidebar data to this file
+  sidebar: _sidebar.yml
+
+  sections:
+    - title: Application functions
+      desc: Real data application
+      contents:
+        # the functions being documented in the package.
+        # you can refer to anything: class methods, modules, etc..
+        # - name: realdata
+        #   children: linked
+        - realdata.compute
