@@ -12,12 +12,20 @@ poetry install
 ```
 
 Enable GPU for your conda environment
+Configure the system paths. You can do it with the following command every time you start a new terminal after activating your conda environment.
+
+```
+CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))
+export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH
+```
+
+For your convenience it is recommended that you automate it with the following commands. The system paths will be automatically configured when you activate this conda environment.
 ```
 mkdir -p $CONDA_PREFIX/etc/conda/activate.d
 echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
-conda activate laueotx
 ```
+
 
 If there are issues with the GPU, please follow the [instructions to install tensorflow](https://www.tensorflow.org/install/pip#step-by-step_instructions
 )

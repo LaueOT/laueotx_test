@@ -12,7 +12,7 @@ website:
       - href: tutorials/index.qmd
         text: Tutorials
       - text: Reference
-        href: reference/index.qmd
+        href: reference/realdata.qmd
       - text: About
         menu:
             - text: "Swiss Data Science Center (SDSC)"
