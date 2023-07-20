@@ -124,8 +124,8 @@ def tf_sparse_SPOT_GreedySubsetSelection(C, segs_src, segs_tgt, n_src, n_tgt, q,
         prototype_set.append(max_increment_ind)
         prototype_cost.append(cost)
 
-    prototype_set = tf.concat(prototype_set, axis=0)
-    prototype_cost = tf.concat(prototype_cost, axis=0)
+    prototype_set = tf.stack(prototype_set)
+    prototype_cost = tf.stack(prototype_cost)
     return prototype_set, prototype_cost
 
 

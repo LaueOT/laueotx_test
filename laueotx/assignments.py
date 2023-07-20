@@ -534,8 +534,8 @@ def prototype_selection_spot(conf, s_target, a_est, x_est, l_est, lookup_data, n
 def prune_candidates_lasso(conf, s_target, a_est, x_est, l_est, lookup_data, noise_sig, batch_size=100, n_sig_out=3, pixel_size=0.1, **kwargs):
 
 
-    from fastlaue3dnd.polycrystalline_sample import polycrystalline_sample, merge_duplicated_spots, apply_selections
-    from fastlaue3dnd.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup, nn_lookup_all, nn_lookup_ind_dist, nn_lookup_all
+    from laueotx.polycrystalline_sample import polycrystalline_sample, merge_duplicated_spots, apply_selections
+    from laueotx.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup, nn_lookup_all, nn_lookup_ind_dist, nn_lookup_all
     tf.config.run_functions_eagerly(True)
 
 
@@ -585,7 +585,7 @@ def prune_candidates_lasso(conf, s_target, a_est, x_est, l_est, lookup_data, noi
         n_target_nn = len(i_target_nn_inds)
         ot_a=tf.ones(len(s), dtype=tf.float64)
         ot_b=tf.ones(n_target_nn, dtype=tf.float64)
-        from fastlaue3dnd import optimal_transport
+        from laueotx import optimal_transport
         Q = optimal_transport.sinkhorn_knopp_unbalanced_sparse(a=ot_a, b=ot_b, K_sparse=K_sparse, i_target=i_target_nn, reg=eps, reg_ma=lam, reg_mb=kap, n_iter_max=1000, err_threshold=1e-6)
         Q += 1e-20
 
@@ -755,8 +755,8 @@ def prune_candidates_lasso(conf, s_target, a_est, x_est, l_est, lookup_data, noi
 
 def prune_candidates_clustering(conf, s_target, a_est, x_est, l_est, lookup_data, noise_sig, batch_size=100, **kwargs):
 
-    from fastlaue3dnd.polycrystalline_sample import polycrystalline_sample, merge_duplicated_spots, apply_selections
-    from fastlaue3dnd.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup, nn_lookup_all, nn_lookup_ind_dist
+    from laueotx.polycrystalline_sample import polycrystalline_sample, merge_duplicated_spots, apply_selections
+    from laueotx.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup, nn_lookup_all, nn_lookup_ind_dist
     tf.config.run_functions_eagerly(True)
     
     # get number of candidates and exit if needed    
@@ -915,8 +915,8 @@ def assign_grain_spot_heuristic_batch(conf, s_target, a_est, x_est, loss, lookup
 
     tf.config.run_functions_eagerly(True)
 
-    from fastlaue3dnd.polycrystalline_sample import polycrystalline_sample, merge_duplicated_spots, apply_selections
-    from fastlaue3dnd.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup, nn_lookup_all, nn_lookup_ind_dist
+    from laueotx.polycrystalline_sample import polycrystalline_sample, merge_duplicated_spots, apply_selections
+    from laueotx.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup, nn_lookup_all, nn_lookup_ind_dist
 
     # sort the parameters according to the loss
     if sort:
@@ -1189,9 +1189,9 @@ def assign_grain_spot_heuristic_with_outliers(spotind_nn, diff_best, i_grn_best,
 def assign_refine_sinkhorn(conf, a_init, x_init, s_target, nn_lookup_data, noise_sig, method='sinkhorn_unbalanced_sparse', test=False):
 
 
-    from fastlaue3dnd.polycrystalline_sample import polycrystalline_sample 
-    from fastlaue3dnd.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup
-    from fastlaue3dnd.deterministic_annealing import get_neighbour_stats, get_sinkhorn_optimization_control_params
+    from laueotx.polycrystalline_sample import polycrystalline_sample 
+    from laueotx.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup
+    from laueotx.deterministic_annealing import get_neighbour_stats, get_sinkhorn_optimization_control_params
 
     # some constants
     n_grn_sample = len(a_init)
@@ -1303,8 +1303,7 @@ def get_softassign_spot_matching(Qs, i_grn_mod, l2, noise_sig=1, n_sig_out=3):
     #     thresh = np.max(Qs.data)/1e10
     thresh = n_sig_out*noise_sig
 
-
-    uc = np.array(np.argmax(Qs, axis=0))[0,:]
+    uc = np.array(np.argmax(Qs, axis=0))
     ur = np.array(np.argmax(Qs, axis=1))[:,0]
 
     l2_csr = l2.tocsr()
