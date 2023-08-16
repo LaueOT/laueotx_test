@@ -2,8 +2,15 @@
 
 ## Installation
 
-We recommend to use miniconda to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.
+We recommend to use miniconda ([Install Instructions](https://docs.conda.io/en/latest/miniconda.html)) to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.
 
+To get started, first clone this repository
+```
+git clone https://github.com/LaueOT/laueotx/
+cd laueotx
+```
+
+Then install all required dependencies
 ```
 conda create -n laueotx -c conda-forge python=3.10 poetry=1.5
 conda activate laueotx
@@ -11,8 +18,7 @@ conda install -c conda-forge cudatoolkit=11.8.0
 poetry install
 ```
 
-Enable GPU for your conda environment
-Configure the system paths. You can do it with the following command every time you start a new terminal after activating your conda environment.
+To enable GPU for your conda environment, you need to configure the system paths. You can do it with the following command every time you start a new terminal after activating your conda environment.
 
 ```
 CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))
