@@ -9,7 +9,7 @@ def main():
     pass
 
 # main.add_command(fakeapp)
-main.add_command(realdata)
+main.add_command(realdata.main)
 
 if __name__ == "__main__":
     main()
