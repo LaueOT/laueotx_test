@@ -9,10 +9,10 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - href: tutorials/index.qmd
+      - href: tutorials/realdata.qmd
         text: Tutorials
       - text: Reference
-        href: reference/realdata.qmd
+        href: reference/index.qmd
       - text: About
         menu:
             - text: "Swiss Data Science Center (SDSC)"
