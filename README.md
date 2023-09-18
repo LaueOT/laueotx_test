@@ -11,8 +11,9 @@ The analysis can take from few minutes on a single CPU for small problems (thous
 Flexible code design enables users to adapt the function to specifics of new problems.
 
 ## Installation
+Below instructions are meant for Linux/MacOS. On Windows we recommend to use the [Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/install).
 
-We recommend to use miniconda ([Install Instructions](https://docs.conda.io/en/latest/miniconda.html)) to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.
+We recommend to use miniconda ([Install Instructions](https://docs.conda.io/en/latest/miniconda.html)) to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies. 
 
 To get started, first clone this repository
 ```
@@ -59,4 +60,25 @@ Download the dataset to `tmp` directory (create it first) and run
 laueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
 laueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
 laueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
+```
+
+
+## Documentation
+You can find the documentation here: 
+
+The documentation is made using Quarto. To update the documentation you need to [install Quarto](https://quarto.org/docs/get-started/). 
+
+You can render the new website using the following commands (make sure to have laueotx installed properly):
+
+```
+conda activate laueotx
+cd docs/
+quarto render
+```
+
+
+The webpage can be published to github pages using
+
+```
+quarto publish gh-pages
 ```
