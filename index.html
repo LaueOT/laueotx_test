@@ -131,10 +131,13 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#laueotx-docs" id="toc-laueotx-docs" class="nav-link active" data-scroll-target="#laueotx-docs">laueotx docs</a>
+  <li><a href="#laueotx-docs" id="toc-laueotx-docs" class="nav-link active" data-scroll-target="#laueotx-docs">laueotx docs</a></li>
+  <li><a href="#laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments" id="toc-laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments" class="nav-link" data-scroll-target="#laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments">LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments</a>
   <ul class="collapse">
+  <li><a href="#what-can-laueot-do" id="toc-what-can-laueot-do" class="nav-link" data-scroll-target="#what-can-laueot-do">What can LaueOT do?</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
   <li><a href="#quickstart" id="toc-quickstart" class="nav-link" data-scroll-target="#quickstart">Quickstart</a></li>
+  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -146,6 +149,14 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="laueotx-docs" class="level1">
 <h1>laueotx docs</h1>
+</section>
+<section id="laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments" class="level1">
+<h1>LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments</h1>
+<p>LaueOT finds positions and orientations of grains in polycrystalline samples from Bragg’s peaks in white-beam tomographic Laue experiments. The GPU-based algorithm enables fast analysis of samples with thousands of grains and millions of spots.</p>
+<section id="what-can-laueot-do" class="level2">
+<h2 class="anchored" data-anchor-id="what-can-laueot-do">What can LaueOT do?</h2>
+<p>The inputs to LaueOT are: positions of measured Bragg’s peaks (often called spots) on the detector screen for each projectsion, experiment parameters (detector dimensions, distances to the sample, etc). The outputs are: a list of grains described by their center in 3D, and orientation matrix with respect to the laboratory reference. The analysis can take from few minutes on a single CPU for small problems (thousands of spots) to few hours on large GPUs (millions of spots). Flexible code design enables users to adapt the function to specifics of new problems.</p>
+</section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>Below instructions are meant for Linux/MacOS. On Windows we recommend to use the <a href="https://learn.microsoft.com/en-us/windows/wsl/install">Windows Subsystem for Linux (WSL)</a>.</p>
@@ -169,10 +180,22 @@ echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH
 </section>
 <section id="quickstart" class="level2">
 <h2 class="anchored" data-anchor-id="quickstart">Quickstart</h2>
+<p>For large problems, LaueOT runs in a trivially-parallel mode, by splitting the single-grain fitting step into independent jobs. Those jobs, called <code>compute</code> can be ran at a HPC cluster, for example using Slurm job arrays. The multi-grain fitting step, called <code>merge</code> collects the output of single jobs and produces the model of the final sample. An example of the process is shown below.</p>
 <p>Download the dataset to <code>tmp</code> directory (create it first) and run</p>
 <pre><code>laueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
 laueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
 laueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000</code></pre>
+</section>
+<section id="documentation" class="level2">
+<h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
+<p>You can find the documentation here:</p>
+<p>The documentation is made using Quarto. To update the documentation you need to <a href="https://quarto.org/docs/get-started/">install Quarto</a>.</p>
+<p>You can render the new website (locally) using the following commands (make sure to have laueotx installed properly):</p>
+<pre><code>conda activate laueotx
+cd docs/
+quarto render</code></pre>
+<p>The webpage can be published to github pages using</p>
+<pre><code>quarto publish gh-pages</code></pre>
 
 
 </section>
