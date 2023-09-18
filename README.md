@@ -1,4 +1,7 @@
+# LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments
 
+LaueOT finds positions and orientations of grains in polycrystalline samples from Bragg's peaks in white-beam tomographic Laue experiments.
+The GPU-based algorithm enables fast analysis of samples with thousands of grains and millions of spots.
 
 ## Installation
 
