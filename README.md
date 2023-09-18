@@ -64,10 +64,10 @@ laueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o re
 
 
 ## Documentation
-You can find the documentation here: 
+You can find the [documentation here](https://laueot.github.io/laueotx/)
 
+### Building the docs
 The documentation is made using Quarto. To update the documentation you need to [install Quarto](https://quarto.org/docs/get-started/). 
-
 You can render the new website (locally) using the following commands (make sure to have laueotx installed properly):
 ```
 conda activate laueotx
