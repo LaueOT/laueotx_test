@@ -3,6 +3,13 @@
 LaueOT finds positions and orientations of grains in polycrystalline samples from Bragg's peaks in white-beam tomographic Laue experiments.
 The GPU-based algorithm enables fast analysis of samples with thousands of grains and millions of spots.
 
+## What can LaueOT it do?
+
+The inputs to LaueOT are: positions of measured Bragg's peaks (often called spots) on the detector screen for each projectsion, experiment parameters (detector dimensions, distances to the sample, etc). 
+The outputs are: a list of grains described by their center in 3D, and orientation matrix with respect to the laboratory reference.
+The analysis can take from few minutes on a single CPU for small problems (thousands of spots) to few hours on large GPUs (millions of spots).
+Flexible code design enables users to adapt the function to specifics of new problems.
+
 ## Installation
 
 We recommend to use miniconda ([Install Instructions](https://docs.conda.io/en/latest/miniconda.html)) to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.
