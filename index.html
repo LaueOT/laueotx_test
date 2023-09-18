@@ -131,8 +131,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#laueotx-docs" id="toc-laueotx-docs" class="nav-link active" data-scroll-target="#laueotx-docs">laueotx docs</a></li>
-  <li><a href="#laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments" id="toc-laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments" class="nav-link" data-scroll-target="#laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments">LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments</a>
+  <li><a href="#laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments" id="toc-laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments" class="nav-link active" data-scroll-target="#laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments">LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments</a>
   <ul class="collapse">
   <li><a href="#what-can-laueot-do" id="toc-what-can-laueot-do" class="nav-link" data-scroll-target="#what-can-laueot-do">What can LaueOT do?</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
@@ -147,9 +146,6 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="laueotx-docs" class="level1">
-<h1>laueotx docs</h1>
-</section>
 <section id="laueot-a-fast-optimal-transport--based-algorithm-for-indexing-polycrystalline-sample-from-laue-experiments" class="level1">
 <h1>LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments</h1>
 <p>LaueOT finds positions and orientations of grains in polycrystalline samples from Bragg’s peaks in white-beam tomographic Laue experiments. The GPU-based algorithm enables fast analysis of samples with thousands of grains and millions of spots.</p>
@@ -194,7 +190,7 @@ laueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o re
 <pre><code>conda activate laueotx
 cd docs/
 quarto render</code></pre>
-<p>The webpage can be published to github pages using</p>
+<p>The webpage can be published to github pages using the following command. It will also be re-rendered in the process.</p>
 <pre><code>quarto publish gh-pages</code></pre>
 
 
