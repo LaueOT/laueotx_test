@@ -48,6 +48,11 @@ If there are issues with the GPU, please follow the [instructions to install ten
 
 ## Quickstart
 
+For large problems, LaueOT runs in a trivially-parallel mode, by splitting the single-grain fitting step into independent jobs.
+Those jobs, called `compute` can be ran at a HPC cluster, for example using Slurm job arrays.
+The multi-grain fitting step, called `merge` collects the output of single jobs and produces the model of the final sample.
+An example of the process is shown below.
+
 Download the dataset to `tmp` directory (create it first) and run
 
 ```
