@@ -68,8 +68,7 @@ You can find the documentation here:
 
 The documentation is made using Quarto. To update the documentation you need to [install Quarto](https://quarto.org/docs/get-started/). 
 
-You can render the new website using the following commands (make sure to have laueotx installed properly):
-
+You can render the new website (locally) using the following commands (make sure to have laueotx installed properly):
 ```
 conda activate laueotx
 cd docs/
@@ -77,8 +76,7 @@ quarto render
 ```
 
 
-The webpage can be published to github pages using
-
+The webpage can be published to github pages using the following command. It will also be re-rendered in the process.
 ```
 quarto publish gh-pages
 ```

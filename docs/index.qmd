@@ -1,4 +1,1 @@
-# laueotx docs
-
-
 {{< include ../README.md >}}
