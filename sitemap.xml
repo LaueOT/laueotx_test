@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://LaueOT.github.io/laueotx/reference/preview.html</loc>
-    <lastmod>2023-09-18T15:08:52.268Z</lastmod>
-  </url>
-  <url>
-    <loc>https://LaueOT.github.io/laueotx/reference/main.html</loc>
-    <lastmod>2023-09-18T15:08:51.928Z</lastmod>
-  </url>
-  <url>
     <loc>https://LaueOT.github.io/laueotx/reference/realdata.compute.html</loc>
-    <lastmod>2023-09-18T15:08:51.556Z</lastmod>
-  </url>
-  <url>
-    <loc>https://LaueOT.github.io/laueotx/tutorials/realdata.html</loc>
-    <lastmod>2023-09-18T15:08:51.120Z</lastmod>
-  </url>
-  <url>
-    <loc>https://LaueOT.github.io/laueotx/tutorials/index.html</loc>
-    <lastmod>2023-09-18T15:08:45.552Z</lastmod>
-  </url>
-  <url>
-    <loc>https://LaueOT.github.io/laueotx/index.html</loc>
-    <lastmod>2023-09-18T15:08:51.352Z</lastmod>
+    <lastmod>2023-09-19T13:38:21.505Z</lastmod>
   </url>
   <url>
     <loc>https://LaueOT.github.io/laueotx/reference/get_object.html</loc>
-    <lastmod>2023-09-18T15:08:51.760Z</lastmod>
+    <lastmod>2023-09-19T13:38:20.882Z</lastmod>
+  </url>
+  <url>
+    <loc>https://LaueOT.github.io/laueotx/reference/preview.html</loc>
+    <lastmod>2023-09-19T13:38:20.295Z</lastmod>
+  </url>
+  <url>
+    <loc>https://LaueOT.github.io/laueotx/tutorials/realdata.html</loc>
+    <lastmod>2023-09-19T13:38:19.708Z</lastmod>
+  </url>
+  <url>
+    <loc>https://LaueOT.github.io/laueotx/index.html</loc>
+    <lastmod>2023-09-19T13:38:13.391Z</lastmod>
+  </url>
+  <url>
+    <loc>https://LaueOT.github.io/laueotx/tutorials/index.html</loc>
+    <lastmod>2023-09-19T13:38:19.984Z</lastmod>
+  </url>
+  <url>
+    <loc>https://LaueOT.github.io/laueotx/reference/main.html</loc>
+    <lastmod>2023-09-19T13:38:20.558Z</lastmod>
   </url>
   <url>
     <loc>https://LaueOT.github.io/laueotx/reference/index.html</loc>
-    <lastmod>2023-09-18T15:08:52.092Z</lastmod>
+    <lastmod>2023-09-19T13:38:21.177Z</lastmod>
   </url>
 </urlset>
