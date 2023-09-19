@@ -54,6 +54,10 @@ fname = '../../results/realdata_fega10_v10_demo/analyze_sample__fega10_v10__merg
 spot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assign, s2s_mod_assign, s2s_obs_assign = plotting.load_sample(fname)
 ```
 
+```{python}
+a_est, x_est = plotting.load_grain_params(fname)
+plotting.plot_scatter3d_sample(a_est, x_est)
+```
 
 ```{python}
 omegas = range(0,360,4)
