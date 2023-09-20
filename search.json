@@ -88,7 +88,7 @@
     "href": "tutorials/realdata.html#plot-prototype-loss",
     "title": "How to work with real data",
     "section": "Plot prototype loss",
-    "text": "Plot prototype loss\n\n\nCode\nplotting.plot_spot_loss_plotly(fname, xscale='linear', yscale='linear', n_max=200)"
+    "text": "Plot prototype loss\n\n\nCode\nplotting.plot_spot_loss_plotly(fname, n_max=None, xscale='linear', yscale='linear')"
   },
   {
     "objectID": "tutorials/realdata.html#plot-spot-assignment",
