@@ -57,7 +57,7 @@ spot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assi
 ```{python}
 #| column: page
 a_est, x_est = plotting.load_grain_params(fname)
-plotting.plot_scatter3d_sample(a_est, x_est)
+plotting.plotly_scatter3d_sample(a_est, x_est)
 ```
 
 ```{python}
@@ -81,13 +81,13 @@ plotting.plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_
 plotting.plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear')
 ```
 
-## Plot spot assignment
+## Plot spots for a given rotation angle
 ```{python}
 #| column: page
 plotting.plotly_scatter_spots_assignment_per_angle(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, p_lam=p_lam, ind_angle=1, omegas=omegas, color_obs='darkgrey', lw=0.5, cmap='tab10')
 ```
 
-## Plot spot match with wavelength
+## Plot spot for a given grain
 ```{python}
 #| column: page
 plotting.plotly_scatter_spots_assignment_per_grain(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, spot_obs_assign=s2g_obs_assign, p_lam=p_lam, ind_grain=1, omegas=omegas, color_obs='darkgrey', lw=0.5, cmap='tab10')
