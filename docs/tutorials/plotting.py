@@ -702,7 +702,7 @@ def plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_a
 
 
 
-def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, ind_angle, p_lam, marker_size=10, omegas=None, color_obs='darkgrey', **kw):
+def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, ind_angle, p_lam, marker_size=10, omegas=None, color_obs='darkgrey',  cmap='tab10', **kw):
 
 
     import plotly.graph_objects as go
@@ -715,7 +715,7 @@ def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, 
     fig = sp.make_subplots(rows=1, cols=ny, subplot_titles=([f'detector={d} angle={om}' for d in det_ids]))
 
     grain_ids = np.unique(inds_mod[2])
-    colors = seaborn.color_palette('tab20', np.max(inds_mod[2])+1).as_hex()
+    colors = seaborn.color_palette(cmap, np.max(inds_mod[2])+1).as_hex()
 
 
     for di in det_ids:
@@ -797,7 +797,7 @@ def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, 
 
 
 
-def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, spot_obs_assign, ind_grain, p_lam, marker_size=10, omegas=None, color_obs='darkgrey', cmap='Spectral',  **kw):
+def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, spot_obs_assign, ind_grain, p_lam, marker_size=10, omegas=None, color_obs='darkgrey', cmap='tab10',  **kw):
     # print('lol')
 
 
