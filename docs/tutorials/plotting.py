@@ -746,8 +746,9 @@ def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, 
                           col=di+1)
 
 
-        fig.update_xaxes(title_text='x [mm]', row=1, col=1)
-        fig.update_yaxes(title_text='y [mm]', row=1, col=1)
+            fig.update_xaxes(title_text='x [mm]', row=1, col=1)
+            fig.update_yaxes(title_text='y [mm]', row=1, col=1)
+            fig.update_layout({f'xaxis{di+1}': {'range': [-max_x, max_x]}, f'yaxis{di+1}': {'range': [-max_y, max_y]}})
 
 
     for di in det_ids:
@@ -820,6 +821,8 @@ def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, 
     angle_ids = np.unique(inds_mod[0])
     colors = np.array(seaborn.color_palette(cmap, max(angle_ids)+1).as_hex())
 
+    max_x = max( max(np.abs(s_obs[:,1])), max(np.abs(s_mod[:,1])))
+    max_y = max( max(np.abs(s_obs[:,2])), max(np.abs(s_mod[:,2])))
 
     for di in det_ids:
 
@@ -855,8 +858,12 @@ def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, 
                           col=di+1)
 
 
-        fig.update_xaxes(title_text='x [mm]', row=1, col=1)
-        fig.update_yaxes(title_text='y [mm]', row=1, col=1)
+            fig.update_xaxes(title_text='x [mm]', row=1, col=di)
+            fig.update_yaxes(title_text='y [mm]', row=1, col=di)
+            fig.update_layout({f'xaxis{di+1}': {'range': [-max_x, max_x]}, f'yaxis{di+1}': {'range': [-max_y, max_y]}})
+
+
+
 
     buttons = []
     buttons.append(dict(method='update',
@@ -870,10 +877,6 @@ def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, 
                         visible=True,
                         args=[{'visible':['legendonly' for x in fig.data]}],
                         ))
-
-    # fig.update_layout()
-    max_x = max( max(np.abs(s_obs[:,1])), max(np.abs(s_mod[:,1])))
-    max_y = max( max(np.abs(s_obs[:,2])), max(np.abs(s_mod[:,2])))
 
     um = [{'buttons':buttons, 'direction': 'down'}]
     fig.update_layout(showlegend=True,
