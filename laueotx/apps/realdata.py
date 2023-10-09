@@ -60,8 +60,9 @@ def main():
 @main.command()
 @common_options
 @click.argument("tasks", nargs=-1)
-def compute(conf: str | Path, output_dir: str, verbosity: bool, n_grid: int, calibrate_coniga: bool, calibrate_fenimn: bool,tasks: list):
-    """Compute the main algorithm
+def compute(conf: str | Path, output_dir: str, verbosity: bool, n_grid: int, tasks: list):
+    """Perform single-grain fitting on part (or full) initialization grid.
+    
 
     Parameters
     ----------
@@ -96,34 +97,24 @@ def compute(conf: str | Path, output_dir: str, verbosity: bool, n_grid: int, cal
 
     conf = utils_io.read_config(conf, args)
 
-    if calibrate_coniga:
-            
-        coniga_calibration(indices, n_grid, conf)
-    
-    if calibrate_fenimn:
-            
-        fenimn_calibration(indices, output_dir, conf)
-    
-    else:
-        omegas = utils_config.get_angles(conf['angles'])
-        LOGGER.info(f'got {len(omegas)} angles')
+    omegas = utils_config.get_angles(conf['angles'])
+    LOGGER.info(f'got {len(omegas)} angles')
 
-        dt = get_detectors_from_config(conf)
+    dt = get_detectors_from_config(conf)
 
-        bl = Beamline(omegas=omegas, 
-                      detectors=dt,
-                      lambda_lim=[conf['beam']['lambda_min'], conf['beam']['lambda_max']])
+    bl = Beamline(omegas=omegas, 
+                  detectors=dt,
+                  lambda_lim=[conf['beam']['lambda_min'], conf['beam']['lambda_max']])
 
 
-        mpd = get_peaskdata_from_config(conf, bl)
+    mpd = get_peaskdata_from_config(conf, bl)
 
-        for index in indices:
-            LOGGER.info(f'=================> running on index {index} / {str(indices)}')
-            dict_out = analyse(n_grid, deepcopy(conf), mpd, index, test=False)
-            filename_out = get_filename_realdata_part(output_dir, tag=conf['tag'], index=index)
-            utils_io.write_arrays(filename_out, **dict_out)
+    for index in indices:
+        LOGGER.info(f'=================> running on index {index} / {str(indices)}')
+        dict_out = analyse(n_grid, deepcopy(conf), mpd, index, test=False)
+        filename_out = get_filename_realdata_part(output_dir, tag=conf['tag'], index=index)
+        utils_io.write_arrays(filename_out, **dict_out)
 
-    # yield 0
 
 
 def setup(args):
@@ -209,6 +200,7 @@ def resources(args):
 
 
 def analyse(n_grid,conf, mpd, index=0, test=False):
+    
     from laueotx import laue_coordinate_descent
     from laueotx.utils import inversion as utils_inversion
     from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, select_indices, merge_duplicated_spots, get_sobol_grid_laue
@@ -396,6 +388,31 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
 @click.argument("tasks", nargs=-1)
 # TODO: create a CLI parameter for test, dict_merged if necessary or remove
 def merge(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fenimn,tasks,test=False,dict_merged = None): 
+    """Perform multi-grain fitting with Optimal Transport. 
+    This function performs the following steps:
+
+        1. collect and merges results from parallelized single-grain fitting runs
+        2. perform prototype selection using OT framework
+        3. perform multi-grain fitting with OT
+
+    The optput is a file .h5 with datasets.
+
+
+    Parameters
+    ----------
+    conf : str | Path
+        Path to the configuration file
+    output_dir : str
+        Path to the output directory where the single-grain fitting results are stored
+    verbosity : bool
+        Verbosity level for printing to console
+    n_grid : int
+        _description_
+    tasks : list
+        _description_
+    """
+
+
     from laueotx import laue_coordinate_descent
     from laueotx.utils import inversion as utils_inversion
     from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, merge_duplicated_spots, apply_selections

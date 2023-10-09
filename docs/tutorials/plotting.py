@@ -682,7 +682,8 @@ def plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_a
     import plotly.graph_objects as go
     import plotly.subplots as sp
 
-    fig = sp.make_subplots(rows=1, cols=2, subplot_titles=("Number of Spots", "L2 Residual Norm per Grain [mm]"))
+    nx, ny = 1, 2
+    fig = sp.make_subplots(rows=nx, cols=ny, subplot_titles=("Number of Spots", "L2 Residual Norm per Grain [mm]"))
 
     fig.add_trace(go.Scatter(x=grain_ids, y=n_matched_spots_per_grain, mode='markers', marker=dict(symbol='diamond'), name='matched'), row=1, col=1)
     fig.add_trace(go.Scatter(x=grain_ids, y=n_model_spots_per_grain, mode='markers', marker=dict(symbol='square'), name='model'), row=1, col=1)
@@ -696,8 +697,10 @@ def plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_a
     fig.update_xaxes(title_text='grain id', row=1, col=2)
     fig.update_yaxes(title_text='l2 residual norm per grain [mm]', row=1, col=2)
 
-    fig.update_layout(showlegend=True)
-    fig.update_layout(legend=dict(x=0.5, y=-0.1, orientation='h'))
+    fig.update_layout(showlegend=True, 
+                      legend=dict(x=0.5, y=-0.1, orientation='h'),
+                      width=ny*500,
+                      height=nx*500)
     fig.show()
 
 
@@ -771,20 +774,21 @@ def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, 
                         ))
 
     # fig.update_layout()
-    um = [{'buttons':buttons, 'direction': 'down'}]
+    um = [{'buttons':buttons, 'direction': 'd'}]
     fig.update_layout(showlegend=True,
                       legend=dict(
                             yanchor="top",
                             y=0.9,
-                            xanchor="right",
-                            x=1.2),
-                      width=ny*1000*1.2,
-                      height=nx*1000,
+                            xanchor="left",
+                            x=1.01),
+                      width=ny*500*1.2,
+                      height=nx*500,
                       title_text=f'Spots for angle {om} deg',
                       updatemenus=[dict(
                                         type='buttons',
                                         direction='right',
-                                        x=1.2,
+                                        xanchor='left',
+                                        x=1.01,
                                         y=1.0,
                                         showactive=True,
                                         buttons=buttons)],)
@@ -852,19 +856,6 @@ def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, 
         fig.update_xaxes(title_text='x [mm]', row=1, col=1)
         fig.update_yaxes(title_text='y [mm]', row=1, col=1)
 
-
-    # for di in det_ids:
-
-
-    #     select_o = (inds_obs[1]==di)  &  (inds_obs[0]==ind_angle)
-    #     s_ = s_obs[select_o]
-    #     fig.add_trace(go.Scatter(x=s_[:,1], y=s_[:,2], 
-    #                   mode='markers', 
-    #                   marker=dict(symbol='x-thin-open', color=color_obs, size=marker_size, line=dict(color='MediumPurple', width=0)), 
-    #                   name=f'Detected ({np.count_nonzero(s_)} spots)'), 
-    #                   row=1, 
-    #                   col=di+1)
-    
     buttons = []
     buttons.append(dict(method='update',
                         label='Show all',
@@ -879,20 +870,26 @@ def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, 
                         ))
 
     # fig.update_layout()
+    max_x = max( max(np.abs(s_obs[:,1])), max(np.abs(s_mod[:,1])))
+    max_y = max( max(np.abs(s_obs[:,2])), max(np.abs(s_mod[:,2])))
+
     um = [{'buttons':buttons, 'direction': 'down'}]
     fig.update_layout(showlegend=True,
+                      xaxis_range=[-max_x, max_x],
+                      yaxis_range=[-max_y, max_y],
                       legend=dict(
                             yanchor="top",
                             y=0.9,
-                            xanchor="right",
-                            x=1.2),
-                      width=ny*1000*1.2,
-                      height=nx*1000,
+                            xanchor="left",
+                            x=1.01),
+                      width=ny*500*1.2,
+                      height=nx*500,
                       title_text=f'Spots for grain {ind_grain}',
                       updatemenus=[dict(
                                         type='buttons',
                                         direction='right',
-                                        x=1.2,
+                                        xanchor='left',
+                                        x=1.01,
                                         y=1.0,
                                         showactive=True,
                                         buttons=buttons)],)
@@ -902,44 +899,6 @@ def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, 
     
 
     
-    # nx, ny = 1, 2; fig, ax = plt.subplots(nx, ny, figsize=(ny * 8, nx * 6), squeeze=False); axc=ax[0,0]; axl=ax[0,:];
-        
-    # om = omegas[ia] if omegas is not None else -99
-    # lims=[-210, 210]
-    
-    # select0o = (inds_obs[1]==0) & (inds_obs[0]==ia)  
-    # select1o = (inds_obs[1]==1) & (inds_obs[0]==ia)
-    # scatter_spots(ax[0,0], s_obs[select0o], marker='x', color=color_obs, s=100, label='peaks', **kw)
-    # scatter_spots(ax[0,1], s_obs[select1o], marker='x', color=color_obs, s=100, label='peaks', **kw)    
-        
-    
-    # grain_ids = np.unique(inds_mod[2])
-    # colors = seaborn.color_palette('tab20', len(grain_ids))
-
-    # select0m = (inds_mod[1]==0) & (inds_mod[0]==ia) & (spot_mod_assign>-1)
-    # select1m = (inds_mod[1]==1) & (inds_mod[0]==ia) & (spot_mod_assign>-1)
-    # colors0 = inds_mod[2][select0m]
-    # colors1 = inds_mod[2][select1m]
-
-    # scatter_spots(ax[0,0], s_mod[select0m], marker='o', c=colors0, s=100, zorder=0, cmap='tab20', colorbar=True, colorbar_label='grain id')
-    # scatter_spots(ax[0,1], s_mod[select1m], marker='o', c=colors1, s=100, zorder=0, cmap='tab20', colorbar=True, colorbar_label='grain id')    
-    
-    # select0m = (inds_mod[1]==0) & (inds_mod[0]==ia) & (spot_mod_assign<0)
-    # select1m = (inds_mod[1]==1) & (inds_mod[0]==ia) & (spot_mod_assign<0)
-    # colors0 = inds_mod[2][select0m]
-    # colors1 = inds_mod[2][select1m]
-    
-    # scatter_spots(ax[0,0], s_mod[select0m], marker='d', c=colors0, s=100, zorder=0, cmap='tab20', colorbar=False, colorbar_label='grain id')
-    # scatter_spots(ax[0,1], s_mod[select1m], marker='d', c=colors1, s=100, zorder=0, cmap='tab20', colorbar=False, colorbar_label='grain id')    
-    
-    # ax[0,0].set_title(f'reflection   om={om:3.0f} deg')
-    # ax[0,1].set_title(f'transmission om={om:3.0f} deg')
-
-
-    # for a in ax.ravel():
-    #     a.legend(loc='upper right')
-    #     a.set(xlim=lims, ylim=lims)
-    #     a.grid(True)
 
     
     
@@ -987,3 +946,5 @@ def plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear'):
 
     # # Show the plot
     fig.show()
+
+

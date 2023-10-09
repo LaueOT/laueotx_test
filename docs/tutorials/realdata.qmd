@@ -55,6 +55,7 @@ spot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assi
 ```
 
 ```{python}
+#| column: page
 a_est, x_est = plotting.load_grain_params(fname)
 plotting.plot_scatter3d_sample(a_est, x_est)
 ```
@@ -70,31 +71,29 @@ plotting.print_nspots_per_det(inds_mod[1], s2g_mod_assign, tag='model    ')
 ```
 
 ```{python}
-#| column: screen
-plotting.plot_grain_stats_plotly(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)
+#| column: page
+plotting.plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)
 ```
 
 ## Plot prototype loss
 ```{python}
-#| column: screen
-plotting.plot_spot_loss_plotly(fname, n_max=None, xscale='linear', yscale='linear')
+#| column: page
+plotting.plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear')
 ```
 
 ## Plot spot assignment
 ```{python}
-#| column: screen
-plotting.scatter_spots_assignment_per_angle_interactive(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, ia=0, omegas=omegas, color_obs='w', lw=0.5)
+#| column: page
+plotting.plotly_scatter_spots_assignment_per_angle(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, p_lam=p_lam, ind_angle=1, omegas=omegas, color_obs='darkgrey', lw=0.5, cmap='tab10')
 ```
-
 
 ## Plot spot match with wavelength
 ```{python}
-#| column: screen
-plotting.scatter_spots_obs_mod_per_angle_interactive(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, p_lam=p_lam, spot_mod_assign=s2g_mod_assign, ia=0, ig=0, omegas=omegas, lambda_lims=[0, 7], lam_vals=False, color_obs='w', lw=0.5)
+#| column: page
+plotting.plotly_scatter_spots_assignment_per_grain(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, spot_obs_assign=s2g_obs_assign, p_lam=p_lam, ind_grain=1, omegas=omegas, color_obs='darkgrey', lw=0.5, cmap='tab10')
 ```
 
-## Plot match per grain
-```{python}
-#| column: screen
-plotting.scatter_spots_assignment_per_grain_interactive(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, p_lam=p_lam, s2g_mod_assign=s2g_mod_assign, s2g_obs_assign=s2g_obs_assign, ig=0, omegas=omegas, color_obs='w')
-```
+
+
+
+
