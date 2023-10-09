@@ -520,7 +520,7 @@ def load_grain_params(fname):
 
     return a_est, x_est
 
-def plot_scatter3d_sample(a_est, x_est, a_max=0.2, alpha=1, suptitle=''):
+def plotly_scatter3d_sample(a_est, x_est, a_max=0.2, alpha=1, suptitle='', plot_size=500):
 
     from plotly.subplots import make_subplots
     import plotly.graph_objects as go
@@ -540,6 +540,8 @@ def plot_scatter3d_sample(a_est, x_est, a_max=0.2, alpha=1, suptitle=''):
 
     # tight layout
     fig.update_layout(margin=dict(l=0.1, r=0.1, b=0.1, t=0.1), 
+                      width=plot_size*1.2,
+                      height=plot_size,
                       scene=dict(xaxis_title='position x [mm]', yaxis_title='position y [mm]', zaxis_title='position y [mm]'), 
                       title={'text':suptitle, 'xanchor': 'center', 'yanchor': 'top', 'y':0.9, 'x':0.5})
     
@@ -641,7 +643,7 @@ def plot_single_projection(path_spots, path_img_b, path_img_f, ia=0, figscale=1,
 ###
 ###########################################################################
 
-def plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs):
+def plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs, plot_size=500):
     
     select = s2s_mod_assign.copy()
     mask = select<0
@@ -699,13 +701,13 @@ def plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_a
 
     fig.update_layout(showlegend=True, 
                       legend=dict(x=0.5, y=-0.1, orientation='h'),
-                      width=ny*500,
-                      height=nx*500)
+                      width=ny*plot_size,
+                      height=nx*plot_size)
     fig.show()
 
 
 
-def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, ind_angle, p_lam, marker_size=10, omegas=None, color_obs='darkgrey',  cmap='tab10', **kw):
+def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, ind_angle, p_lam, marker_size=10, omegas=None, color_obs='darkgrey',  cmap='tab10', plot_size=500, **kw):
 
 
     import plotly.graph_objects as go
@@ -781,8 +783,8 @@ def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, 
                             y=0.9,
                             xanchor="left",
                             x=1.01),
-                      width=ny*500*1.2,
-                      height=nx*500,
+                      width=ny*plot_size*1.2,
+                      height=nx*plot_size,
                       title_text=f'Spots for angle {om} deg',
                       updatemenus=[dict(
                                         type='buttons',
@@ -801,7 +803,7 @@ def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, 
 
 
 
-def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, spot_obs_assign, ind_grain, p_lam, marker_size=10, omegas=None, color_obs='darkgrey', cmap='tab10',  **kw):
+def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, spot_obs_assign, ind_grain, p_lam, marker_size=10, omegas=None, color_obs='darkgrey', cmap='tab10', plot_size=500,  **kw):
     # print('lol')
 
 
@@ -882,8 +884,8 @@ def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, 
                             y=0.9,
                             xanchor="left",
                             x=1.01),
-                      width=ny*500*1.2,
-                      height=nx*500,
+                      width=ny*plot_size*1.2,
+                      height=nx*plot_size,
                       title_text=f'Spots for grain {ind_grain}',
                       updatemenus=[dict(
                                         type='buttons',
@@ -903,7 +905,7 @@ def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, 
     
     
 
-def plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear'):
+def plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear', plot_size=500):
     
     import h5py
     import numpy as np
@@ -933,8 +935,8 @@ def plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear'):
         fig.add_vline(x=n_grains, row=1, col=i+1)
 
     fig.update_layout(
-        width=ny*500,
-        height=nx*500,
+        width=ny*plot_size,
+        height=nx*plot_size,
         title_text='SPOT Loss Analysis',
         showlegend=False
     ) 
