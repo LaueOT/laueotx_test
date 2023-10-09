@@ -722,6 +722,8 @@ def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, 
     grain_ids = np.unique(inds_mod[2])
     colors = seaborn.color_palette(cmap, np.max(inds_mod[2])+1).as_hex()
 
+    max_x = max( max(np.abs(s_obs[:,1])), max(np.abs(s_mod[:,1])))
+    max_y = max( max(np.abs(s_obs[:,2])), max(np.abs(s_mod[:,2])))
 
     for di in det_ids:
 
