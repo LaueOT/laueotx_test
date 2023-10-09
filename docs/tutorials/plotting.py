@@ -190,7 +190,8 @@ def load_sample(fname):
         i_det_mod = np.array(f['assignments/global/i_det'])[:,0]
         i_ang_mod = np.array(f['assignments/global/i_ang'])[:,0]
         i_grn_mod = np.array(f['assignments/global/i_grn'])[:,0]
-        inds_mod = (i_ang_mod, i_det_mod, i_grn_mod)
+        i_hkl_mod = np.array(f['assignments/global/i_hkl'])[:,0]
+        inds_mod = (i_ang_mod, i_det_mod, i_grn_mod, i_hkl_mod)
 
         i_ang_obs = np.array(f['i_ang_obs'])[:,0]
         i_det_obs = np.array(f['i_det_obs'])[:,0]
@@ -256,65 +257,6 @@ def plot_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_ass
     axl[0].legend()
     axl[1].legend()
 
-def plot_grain_stats_plotly(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs):
-    
-    select = s2s_mod_assign.copy()
-    mask = select<0
-    select[mask] = 0
-    s_obs_match = s_obs[select]
-    l2_mod = np.linalg.norm(s_obs_match-s_mod, axis=1)
-    l2_mod[mask]=-99999
-
-    print(f'n_grains={len(np.unique(inds_mod[2]))}')
-
-    n_outliers_obs = np.count_nonzero(s2g_obs_assign<0)
-    n_outliers_mod = np.count_nonzero(s2g_mod_assign<0)
-    
-    n_grains = len(np.unique(s2g_obs_assign))-1
-    
-    spot_obs_inlier = s2g_obs_assign[s2g_obs_assign>=0]
-    spot_mod_inlier = s2g_mod_assign[s2g_mod_assign>=0]
-    l2_mod_inlier = l2_mod[s2g_mod_assign>=0]
-    grain_ids = np.unique(spot_obs_inlier)
-    n_matched_spots_per_grain = np.array([np.count_nonzero(spot_obs_inlier==g) for g in np.unique(spot_obs_inlier)])
-    n_model_spots_per_grain = np.array([np.count_nonzero(inds_mod[2]==g) for g in grain_ids])
-    median_l2_per_grain = np.array([ np.median(l2_mod_inlier[spot_mod_inlier==g]) for g in np.unique(spot_mod_inlier) ] )
-    mean_l2_per_grain = np.array([ np.mean(l2_mod_inlier[spot_mod_inlier==g]) for g in np.unique(spot_mod_inlier) ] )
-    
-    # nx, ny = 1, 2; fig, ax = plt.subplots(nx, ny, figsize=(ny * 8, nx * 6), squeeze=False); axc=ax[0,0]; axl=ax[0,:];
-    
-    # axl[0].plot(grain_ids, n_matched_spots_per_grain, 'd', label='matched')
-    # axl[0].plot(grain_ids, n_model_spots_per_grain, 's', label='model')
-    
-    # axl[0].set(xlabel='grain id', ylabel='number of spots', ylim=[0,None])
-
-    # axl[1].plot(grain_ids, mean_l2_per_grain, 'd', label='mean')
-    # axl[1].plot(grain_ids, median_l2_per_grain, 's', label='median')
-    # axl[1].set(xlabel='grain id', ylabel='l2 residual norm per grain [mm]')    
-    # axl[0].legend()
-    # axl[1].legend()
-
-    import plotly.graph_objects as go
-
-    import plotly.subplots as sp
-
-    fig = sp.make_subplots(rows=1, cols=2, subplot_titles=("Number of Spots", "L2 Residual Norm per Grain [mm]"))
-
-    fig.add_trace(go.Scatter(x=grain_ids, y=n_matched_spots_per_grain, mode='markers', marker=dict(symbol='diamond'), name='matched'), row=1, col=1)
-    fig.add_trace(go.Scatter(x=grain_ids, y=n_model_spots_per_grain, mode='markers', marker=dict(symbol='square'), name='model'), row=1, col=1)
-
-    fig.add_trace(go.Scatter(x=grain_ids, y=mean_l2_per_grain, mode='markers', marker=dict(symbol='diamond'), name='mean'), row=1, col=2)
-    fig.add_trace(go.Scatter(x=grain_ids, y=median_l2_per_grain, mode='markers', marker=dict(symbol='square'), name='median'), row=1, col=2)
-
-    fig.update_xaxes(title_text='grain id', row=1, col=1)
-    fig.update_yaxes(title_text='number of spots', range=[0, None], row=1, col=1)
-
-    fig.update_xaxes(title_text='grain id', row=1, col=2)
-    fig.update_yaxes(title_text='l2 residual norm per grain [mm]', row=1, col=2)
-
-    fig.update_layout(showlegend=True)
-    fig.update_layout(legend=dict(x=0.5, y=-0.1, orientation='h'))
-    fig.show()
 
 
 def plot_spot_statistics(fname, print_stats=False):
@@ -336,7 +278,69 @@ def plot_spot_statistics(fname, print_stats=False):
         for i in range(len(ang)):
             print(i, n_per_ang_det0[i], n_per_ang_det1[i])
 
-    
+
+# def plot_spot_loss_plotly(fname, n_max=None, xscale='linear', yscale='linear'):    
+
+#     import h5py
+#     import numpy as np
+#     import plotly.express as px
+#     import plotly.graph_objects as go
+
+#     with h5py.File(fname, 'r') as f:
+#         spot_loss = np.array(f['spot_loss'])
+
+#     spot_loss_diff = lambda spot_loss: spot_loss[1:] / spot_loss[:-1]
+#     x = np.arange(len(spot_loss))
+#     y = spot_loss - np.min(spot_loss)
+#     y = y / np.max(y)
+
+#     min_y = 1e-3
+
+#     fig = go.Figure()
+
+#     # Create subplots
+#     fig.add_trace(go.Scatter(x=x, y=spot_loss, mode='markers', name='SPOT loss'))
+#     fig.add_trace(go.Scatter(x=x, y=y, mode='markers', name='SPOT loss (normalized)'))
+#     fig.add_trace(go.Scatter(x=x[1:], y=np.diff(y, n=1), mode='markers', name='SPOT loss frac diff'))
+#     fig.add_trace(go.Scatter(x=x, y=spot_loss_diff(spot_loss), mode='markers', name='SPOT loss diff'))
+
+#     # Add horizontal lines
+#     fig.add_shape(go.layout.Shape(
+#         type="line",
+#         x0=0,
+#         x1=n_max if n_max else len(spot_loss),
+#         y0=min_y,
+#         y1=min_y,
+#         line=dict(color="red", dash="dash"),
+#     ))
+#     fig.add_shape(go.layout.Shape(
+#         type="line",
+#         x0=0,
+#         x1=n_max if n_max else len(spot_loss),
+#         y0=-min_y,
+#         y1=-min_y,
+#         line=dict(color="red", dash="dash"),
+#     ))
+
+#     # Update axis properties
+#     fig.update_xaxes(title_text='prototype index', range=[0, n_max] if n_max else None, type=xscale)
+#     fig.update_yaxes(title_text='SPOT loss', type=yscale)
+
+#     # Set layout options
+#     fig.update_layout(
+#         width=ny * 8,
+#         height=nx * 6,
+#         title_text='SPOT Loss Analysis',
+#         legend=dict(x=0, y=1),
+#         grid=dict(yaxis=dict(showgrid=True, zeroline=False, showline=True)),
+#     )
+
+#     # Show the plot
+#     fig.show()
+
+# Example usage:
+# plot_spot_loss('your_file_name.h5', n_max=100, xscale='linear', yscale='linear')
+
 
 def plot_spot_loss(fname, n_max=None, xscale='linear', yscale='linear'):
 
@@ -372,6 +376,7 @@ def plot_spot_loss(fname, n_max=None, xscale='linear', yscale='linear'):
     axl[2].set(xlabel='prototype index', ylabel='SPOT loss frac diff', xlim=[0,n_max], xscale=xscale, yscale=yscale)
     axl[3].set(xlabel='prototype index', ylabel='SPOT loss diff', xlim=[0,n_max], xscale=xscale, yscale=yscale)
     for a in axl: a.grid(True)
+
 
 
 ###########################################################################
@@ -541,7 +546,7 @@ def plot_scatter3d_sample(a_est, x_est, a_max=0.2, alpha=1, suptitle=''):
     
     fig.show()   
 
-    return fig 
+    
 
 
 ###########################################################################
@@ -626,5 +631,359 @@ def plot_single_projection(path_spots, path_img_b, path_img_f, ia=0, figscale=1,
     axl[1].set(title=f'transmission, projection {ia}', xlim=lims, ylim=lims)
 
 
+
+
+
+
+###########################################################################
+###
+### Plotly versions
+###
+###########################################################################
+
+def plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs):
+    
+    select = s2s_mod_assign.copy()
+    mask = select<0
+    select[mask] = 0
+    s_obs_match = s_obs[select]
+    l2_mod = np.linalg.norm(s_obs_match-s_mod, axis=1)
+    l2_mod[mask]=-99999
+
+    print(f'n_grains={len(np.unique(inds_mod[2]))}')
+
+    n_outliers_obs = np.count_nonzero(s2g_obs_assign<0)
+    n_outliers_mod = np.count_nonzero(s2g_mod_assign<0)
+    
+    n_grains = len(np.unique(s2g_obs_assign))-1
+    
+    spot_obs_inlier = s2g_obs_assign[s2g_obs_assign>=0]
+    spot_mod_inlier = s2g_mod_assign[s2g_mod_assign>=0]
+    l2_mod_inlier = l2_mod[s2g_mod_assign>=0]
+    grain_ids = np.unique(spot_obs_inlier)
+    n_matched_spots_per_grain = np.array([np.count_nonzero(spot_obs_inlier==g) for g in np.unique(spot_obs_inlier)])
+    n_model_spots_per_grain = np.array([np.count_nonzero(inds_mod[2]==g) for g in grain_ids])
+    median_l2_per_grain = np.array([ np.median(l2_mod_inlier[spot_mod_inlier==g]) for g in np.unique(spot_mod_inlier) ] )
+    mean_l2_per_grain = np.array([ np.mean(l2_mod_inlier[spot_mod_inlier==g]) for g in np.unique(spot_mod_inlier) ] )
+    
+    # nx, ny = 1, 2; fig, ax = plt.subplots(nx, ny, figsize=(ny * 8, nx * 6), squeeze=False); axc=ax[0,0]; axl=ax[0,:];
+    
+    # axl[0].plot(grain_ids, n_matched_spots_per_grain, 'd', label='matched')
+    # axl[0].plot(grain_ids, n_model_spots_per_grain, 's', label='model')
+    
+    # axl[0].set(xlabel='grain id', ylabel='number of spots', ylim=[0,None])
+
+    # axl[1].plot(grain_ids, mean_l2_per_grain, 'd', label='mean')
+    # axl[1].plot(grain_ids, median_l2_per_grain, 's', label='median')
+    # axl[1].set(xlabel='grain id', ylabel='l2 residual norm per grain [mm]')    
+    # axl[0].legend()
+    # axl[1].legend()
+
+    import plotly.graph_objects as go
+    import plotly.subplots as sp
+
+    fig = sp.make_subplots(rows=1, cols=2, subplot_titles=("Number of Spots", "L2 Residual Norm per Grain [mm]"))
+
+    fig.add_trace(go.Scatter(x=grain_ids, y=n_matched_spots_per_grain, mode='markers', marker=dict(symbol='diamond'), name='matched'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=grain_ids, y=n_model_spots_per_grain, mode='markers', marker=dict(symbol='square'), name='model'), row=1, col=1)
+
+    fig.add_trace(go.Scatter(x=grain_ids, y=mean_l2_per_grain, mode='markers', marker=dict(symbol='diamond'), name='mean'), row=1, col=2)
+    fig.add_trace(go.Scatter(x=grain_ids, y=median_l2_per_grain, mode='markers', marker=dict(symbol='square'), name='median'), row=1, col=2)
+
+    fig.update_xaxes(title_text='grain id', row=1, col=1)
+    fig.update_yaxes(title_text='number of spots', range=[0, None], row=1, col=1)
+
+    fig.update_xaxes(title_text='grain id', row=1, col=2)
+    fig.update_yaxes(title_text='l2 residual norm per grain [mm]', row=1, col=2)
+
+    fig.update_layout(showlegend=True)
+    fig.update_layout(legend=dict(x=0.5, y=-0.1, orientation='h'))
+    fig.show()
+
+
+
+def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, ind_angle, p_lam, marker_size=10, omegas=None, color_obs='darkgrey', **kw):
+
+
+    import plotly.graph_objects as go
+    import plotly.subplots as sp
+
+
+    om = omegas[ind_angle]
+    det_ids = np.unique(inds_obs[1])
+    nx, ny = 1, len(det_ids)
+    fig = sp.make_subplots(rows=1, cols=ny, subplot_titles=([f'detector={d} angle={om}' for d in det_ids]))
+
+    grain_ids = np.unique(inds_mod[2])
+    colors = seaborn.color_palette('tab20', np.max(inds_mod[2])+1).as_hex()
+
+
+    for di in det_ids:
+
+        for gi, ind_grain in enumerate(grain_ids):
+
+            select_m = (inds_mod[1]==di) & (inds_mod[0]==ind_angle) & (inds_mod[2]==ind_grain) & (spot_mod_assign>-1)
+
+            s_ = s_mod[select_m]
+            p_ = p_lam[select_m]
+            m_ = inds_mod[3][select_m]
+
+            hovertext = [f'x={s__[1]: 2.3f} y={s__[2]: 2.3f} lam={p__: 2.3f} hkl=[{m__}] gi={gi} ' for s__,p__,m__ in zip(s_, p_, m_)]
+
+            fig.add_trace(go.Scatter(x=s_[:,1], y=s_[:,2], 
+                          mode='markers', 
+                          visible=True,
+                          marker=dict(symbol='circle-dot', color=colors[ind_grain], size=marker_size), 
+                          name=f'Model {ind_grain: 3d}, Detector {di}, Spots {np.count_nonzero(s_)}',
+                          hovertext=hovertext,
+                          hoverinfo='text'), 
+                          row=1, 
+                          col=di+1)
+
+
+        fig.update_xaxes(title_text='x [mm]', row=1, col=1)
+        fig.update_yaxes(title_text='y [mm]', row=1, col=1)
+
+
+    for di in det_ids:
+
+
+        select_o = (inds_obs[1]==di) & (inds_obs[0]==ind_angle)  
+        s_ = s_obs[select_o]
+        fig.add_trace(go.Scatter(x=s_[:,1], y=s_[:,2], 
+                      mode='markers', 
+                      marker=dict(symbol='x-thin-open', color=color_obs, size=marker_size, line=dict(color='MediumPurple', width=0)), 
+                      name=f'Detected ({np.count_nonzero(s_)} spots)'), 
+                      row=1, 
+                      col=di+1)
+    
+    buttons = []
+    buttons.append(dict(method='update',
+                        label='Show all',
+                        visible=True,
+                        args=[{'visible':[True for x in fig.data]}],
+                        ))
+
+    buttons.append(dict(method='update',
+                        label='Show none',
+                        visible=True,
+                        args=[{'visible':['legendonly' for x in fig.data]}],
+                        ))
+
+    # fig.update_layout()
+    um = [{'buttons':buttons, 'direction': 'down'}]
+    fig.update_layout(showlegend=True,
+                      legend=dict(
+                            yanchor="top",
+                            y=0.9,
+                            xanchor="right",
+                            x=1.2),
+                      width=ny*1000*1.2,
+                      height=nx*1000,
+                      title_text=f'Spots for angle {om} deg',
+                      updatemenus=[dict(
+                                        type='buttons',
+                                        direction='right',
+                                        x=1.2,
+                                        y=1.0,
+                                        showactive=True,
+                                        buttons=buttons)],)
+
+
+    fig.show()
+    
+
+
+
+
+
+def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, spot_obs_assign, ind_grain, p_lam, marker_size=10, omegas=None, color_obs='darkgrey', cmap='Spectral',  **kw):
+    # print('lol')
+
+
+    import plotly.graph_objects as go
+    import plotly.subplots as sp
+
+
+    
+    det_ids = np.unique(inds_obs[1])
+    nx, ny = 1, len(det_ids)
+    fig = sp.make_subplots(rows=1, cols=ny, subplot_titles=([f'detector={d}' for d in det_ids]))
+
+    grain_ids = np.unique(inds_mod[2])
+    angle_ids = np.unique(inds_mod[0])
+    colors = np.array(seaborn.color_palette(cmap, max(angle_ids)+1).as_hex())
+
+
+    for di in det_ids:
+
+        for ai, ind_angle in enumerate(angle_ids):
+
+
+            select_m = (inds_mod[1]==di) & (inds_mod[2]==ind_grain) &  (inds_mod[0]==ind_angle) & (spot_mod_assign>-1)
+
+            sm_ = s_mod[select_m]
+            pm_ = p_lam[select_m]
+            mm_ = inds_mod[3][select_m]
+            hm_ = [f'x={s__[1]: 2.3f} y={s__[2]: 2.3f} lam={p__: 2.3f} hkl=[{m__}] rot={omegas[ind_angle]} ' for s__,p__,m__ in zip(sm_, pm_, mm_)]
+
+            select_o = (inds_obs[1]==di)  &  (inds_obs[0]==ind_angle)  & (spot_obs_assign==ind_grain)
+            so_ = s_obs[select_o]
+            ho_ = [f'x={s__[1]: 2.3f} y={s__[2]: 2.3f} rot={omegas[ind_angle]} deg ' for s__ in so_]
+
+            s_ = np.vstack([sm_, so_])
+            c_ = [colors[ind_angle]]*len(sm_) + [color_obs]*len(so_)
+            hovertext = hm_ + ho_
+
+            symbol = ['circle-dot']*len(sm_) + ['x-thin-open']*len(so_)
+
+
+            fig.add_trace(go.Scatter(x=s_[:,1], y=s_[:,2], 
+                          mode='markers', 
+                          visible=True,
+                          marker=dict(symbol=symbol, color=c_, size=marker_size), 
+                          name=f'Rotation {omegas[ind_angle]: 3d} deg, Detector {di}, Spots {np.count_nonzero(select_m)}/{np.count_nonzero(select_o)}',
+                          hovertext=hovertext,
+                          hoverinfo='text'), 
+                          row=1, 
+                          col=di+1)
+
+
+        fig.update_xaxes(title_text='x [mm]', row=1, col=1)
+        fig.update_yaxes(title_text='y [mm]', row=1, col=1)
+
+
+    # for di in det_ids:
+
+
+    #     select_o = (inds_obs[1]==di)  &  (inds_obs[0]==ind_angle)
+    #     s_ = s_obs[select_o]
+    #     fig.add_trace(go.Scatter(x=s_[:,1], y=s_[:,2], 
+    #                   mode='markers', 
+    #                   marker=dict(symbol='x-thin-open', color=color_obs, size=marker_size, line=dict(color='MediumPurple', width=0)), 
+    #                   name=f'Detected ({np.count_nonzero(s_)} spots)'), 
+    #                   row=1, 
+    #                   col=di+1)
+    
+    buttons = []
+    buttons.append(dict(method='update',
+                        label='Show all',
+                        visible=True,
+                        args=[{'visible':[True for x in fig.data]}],
+                        ))
+
+    buttons.append(dict(method='update',
+                        label='Show none',
+                        visible=True,
+                        args=[{'visible':['legendonly' for x in fig.data]}],
+                        ))
+
+    # fig.update_layout()
+    um = [{'buttons':buttons, 'direction': 'down'}]
+    fig.update_layout(showlegend=True,
+                      legend=dict(
+                            yanchor="top",
+                            y=0.9,
+                            xanchor="right",
+                            x=1.2),
+                      width=ny*1000*1.2,
+                      height=nx*1000,
+                      title_text=f'Spots for grain {ind_grain}',
+                      updatemenus=[dict(
+                                        type='buttons',
+                                        direction='right',
+                                        x=1.2,
+                                        y=1.0,
+                                        showactive=True,
+                                        buttons=buttons)],)
+
+
+    fig.show()
+    
+
+    
+    # nx, ny = 1, 2; fig, ax = plt.subplots(nx, ny, figsize=(ny * 8, nx * 6), squeeze=False); axc=ax[0,0]; axl=ax[0,:];
+        
+    # om = omegas[ia] if omegas is not None else -99
+    # lims=[-210, 210]
+    
+    # select0o = (inds_obs[1]==0) & (inds_obs[0]==ia)  
+    # select1o = (inds_obs[1]==1) & (inds_obs[0]==ia)
+    # scatter_spots(ax[0,0], s_obs[select0o], marker='x', color=color_obs, s=100, label='peaks', **kw)
+    # scatter_spots(ax[0,1], s_obs[select1o], marker='x', color=color_obs, s=100, label='peaks', **kw)    
+        
+    
+    # grain_ids = np.unique(inds_mod[2])
+    # colors = seaborn.color_palette('tab20', len(grain_ids))
+
+    # select0m = (inds_mod[1]==0) & (inds_mod[0]==ia) & (spot_mod_assign>-1)
+    # select1m = (inds_mod[1]==1) & (inds_mod[0]==ia) & (spot_mod_assign>-1)
+    # colors0 = inds_mod[2][select0m]
+    # colors1 = inds_mod[2][select1m]
+
+    # scatter_spots(ax[0,0], s_mod[select0m], marker='o', c=colors0, s=100, zorder=0, cmap='tab20', colorbar=True, colorbar_label='grain id')
+    # scatter_spots(ax[0,1], s_mod[select1m], marker='o', c=colors1, s=100, zorder=0, cmap='tab20', colorbar=True, colorbar_label='grain id')    
+    
+    # select0m = (inds_mod[1]==0) & (inds_mod[0]==ia) & (spot_mod_assign<0)
+    # select1m = (inds_mod[1]==1) & (inds_mod[0]==ia) & (spot_mod_assign<0)
+    # colors0 = inds_mod[2][select0m]
+    # colors1 = inds_mod[2][select1m]
+    
+    # scatter_spots(ax[0,0], s_mod[select0m], marker='d', c=colors0, s=100, zorder=0, cmap='tab20', colorbar=False, colorbar_label='grain id')
+    # scatter_spots(ax[0,1], s_mod[select1m], marker='d', c=colors1, s=100, zorder=0, cmap='tab20', colorbar=False, colorbar_label='grain id')    
+    
+    # ax[0,0].set_title(f'reflection   om={om:3.0f} deg')
+    # ax[0,1].set_title(f'transmission om={om:3.0f} deg')
+
+
+    # for a in ax.ravel():
+    #     a.legend(loc='upper right')
+    #     a.set(xlim=lims, ylim=lims)
+    #     a.grid(True)
+
     
     
+
+def plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear'):
+    
+    import h5py
+    import numpy as np
+    from plotly.subplots import make_subplots
+    import plotly.express as px
+    import plotly.graph_objects as go
+
+    with h5py.File(fname, 'r') as f:
+        spot_loss = np.array(f['spot_loss'])
+        a_est = np.array(f['assignments/global/a'])
+        n_grains = len(a_est)
+
+    spot_loss_diff = lambda spot_loss: spot_loss[1:] / spot_loss[:-1]
+    x = np.arange(len(spot_loss))
+    y = spot_loss - np.min(spot_loss)
+    y = y / np.max(y)
+
+    min_y = 1e-3
+
+    nx, ny = 1, 2;
+    fig = make_subplots(rows=nx, cols=ny) 
+
+    # Create subplots
+    fig.add_trace(go.Scatter(x=x, y=spot_loss, mode='markers', name=''), row=1, col=1)
+    fig.add_trace(go.Scatter(x=x+2, y=spot_loss_diff(spot_loss), mode='markers', name=''), row=1, col=2)
+    for i in range(ny):
+        fig.add_vline(x=n_grains, row=1, col=i+1)
+
+    fig.update_layout(
+        width=ny*500,
+        height=nx*500,
+        title_text='SPOT Loss Analysis',
+        showlegend=False
+    ) 
+
+    for i in range(ny):
+        fig.update_xaxes(title_text="Number of grains", row=1, col=i+1)
+    fig.update_yaxes(title_text="SPOT loss", row=1, col=1)
+    fig.update_yaxes(title_text="SPOT loss fractional difference", row=1, col=2)
+
+    # # Show the plot
+    fig.show()

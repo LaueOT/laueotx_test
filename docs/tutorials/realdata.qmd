@@ -74,15 +74,10 @@ plotting.print_nspots_per_det(inds_mod[1], s2g_mod_assign, tag='model    ')
 plotting.plot_grain_stats_plotly(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)
 ```
 
-```{python}
-#| column: screen
-plotting.plot_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)
-```
-
 ## Plot prototype loss
 ```{python}
 #| column: screen
-plotting.plot_spot_loss(fname, xscale='linear', yscale='linear', n_max=200)
+plotting.plot_spot_loss_plotly(fname, n_max=None, xscale='linear', yscale='linear')
 ```
 
 ## Plot spot assignment
