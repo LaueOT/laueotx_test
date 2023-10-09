@@ -91,18 +91,18 @@
     "text": "Plot prototype loss\n\n\nCode\nplotting.plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear')"
   },
   {
-    "objectID": "tutorials/realdata.html#plot-spot-assignment",
-    "href": "tutorials/realdata.html#plot-spot-assignment",
+    "objectID": "tutorials/realdata.html#plot-spots-for-a-given-rotation-angle",
+    "href": "tutorials/realdata.html#plot-spots-for-a-given-rotation-angle",
     "title": "How to work with real data",
-    "section": "Plot spot assignment",
-    "text": "Plot spot assignment\n\n\nCode\nplotting.plotly_scatter_spots_assignment_per_angle(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, p_lam=p_lam, ind_angle=1, omegas=omegas, color_obs='darkgrey', lw=0.5, cmap='tab10')"
+    "section": "Plot spots for a given rotation angle",
+    "text": "Plot spots for a given rotation angle\n\n\nCode\nplotting.plotly_scatter_spots_assignment_per_angle(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, p_lam=p_lam, ind_angle=1, omegas=omegas, color_obs='darkgrey', lw=0.5, cmap='tab10')"
   },
   {
-    "objectID": "tutorials/realdata.html#plot-spot-match-with-wavelength",
-    "href": "tutorials/realdata.html#plot-spot-match-with-wavelength",
+    "objectID": "tutorials/realdata.html#plot-spot-for-a-given-grain",
+    "href": "tutorials/realdata.html#plot-spot-for-a-given-grain",
     "title": "How to work with real data",
-    "section": "Plot spot match with wavelength",
-    "text": "Plot spot match with wavelength\n\n\nCode\nplotting.plotly_scatter_spots_assignment_per_grain(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, spot_obs_assign=s2g_obs_assign, p_lam=p_lam, ind_grain=1, omegas=omegas, color_obs='darkgrey', lw=0.5, cmap='tab10')"
+    "section": "Plot spot for a given grain",
+    "text": "Plot spot for a given grain\n\n\nCode\nplotting.plotly_scatter_spots_assignment_per_grain(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, spot_obs_assign=s2g_obs_assign, p_lam=p_lam, ind_grain=1, omegas=omegas, color_obs='darkgrey', lw=0.5, cmap='tab10')"
   },
   {
     "objectID": "index.html",
