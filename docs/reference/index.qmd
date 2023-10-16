@@ -6,4 +6,5 @@ Real data application
 
 | | |
 | --- | --- |
-| [realdata.compute](realdata.compute.qmd#laueotx.realdata.compute) | Compute the main algorithm |
+| [realdata.singlegrain](realdata.singlegrain.qmd#laueotx.realdata.singlegrain) | Perform single-grain fitting on part (or full) initialization grid. |
+| [realdata.multigrain](realdata.multigrain.qmd#laueotx.realdata.multigrain) | Perform multi-grain fitting with Optimal Transport.  |

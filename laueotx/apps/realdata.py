@@ -60,7 +60,7 @@ def main():
 @main.command()
 @common_options
 @click.argument("tasks", nargs=-1)
-def compute(conf: str | Path, output_dir: str, verbosity: bool, n_grid: int, tasks: list):
+def singlegrain(conf: str | Path, output_dir: str, verbosity: bool, n_grid: int, tasks: list):
     """Perform single-grain fitting on part (or full) initialization grid.
     
 
@@ -387,7 +387,7 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
 @common_options
 @click.argument("tasks", nargs=-1)
 # TODO: create a CLI parameter for test, dict_merged if necessary or remove
-def merge(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fenimn,tasks,test=False,dict_merged = None): 
+def multigrain(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fenimn,tasks,test=False,dict_merged = None): 
     """Perform multi-grain fitting with Optimal Transport. 
     This function performs the following steps:
 
@@ -797,7 +797,7 @@ def fenimn_calibration(indices, output_dir, conf):
         # main magic
 
         dict_out = analyse(n_grid, conf, mpd, index=0, test=False)
-        merge(indices=[0], args=args, dict_merged=dict_out)
+        multigrain(indices=[0], args=args, dict_merged=dict_out)
 
 
 

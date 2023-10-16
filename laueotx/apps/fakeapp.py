@@ -41,12 +41,12 @@ def main():
 @main.command()
 @common_options
 @click.argument("tasks", nargs=-1)
-def compute(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks):
+def singlegrain(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks):
     for x in range(count):
         click.echo(f"Hello {name}!")
 
 @main.command()
 @common_options
 @click.argument("tasks", nargs=-1)
-def merge(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks):
+def multigrain(conf, output_dir, n_grid, calibrate_coniga, calibrate_fenimn,tasks):
     click.echo("tasks")

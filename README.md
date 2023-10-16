@@ -50,16 +50,16 @@ If there are issues with the GPU, please follow the [instructions to install ten
 ## Quickstart
 
 For large problems, LaueOT runs in a trivially-parallel mode, by splitting the single-grain fitting step into independent jobs.
-Those jobs, called `compute` can be ran at a HPC cluster, for example using Slurm job arrays.
-The multi-grain fitting step, called `merge` collects the output of single jobs and produces the model of the final sample.
+Those jobs, called `singlegrain` can be ran at a HPC cluster, for example using Slurm job arrays.
+The multi-grain fitting step, called `multigrain` collects the output of single jobs and produces the model of the final sample.
 An example of the process is shown below.
 
 Download the dataset to `tmp` directory (create it first) and run
 
 ```
-laueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
-laueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
-laueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
+laueotx realdata singlegrain 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
+laueotx realdata singlegrain 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
+laueotx realdata multigrain 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000
 ```
 
 
@@ -80,3 +80,37 @@ The webpage can be published to github pages using the following command. It wil
 ```
 quarto publish gh-pages
 ```
+
+### Building the API reference
+We are using [quartodoc](https://github.com/machow/quartodoc) to build the API reference. For every functions (e.g. `realdata.singlegrain`) that should go into the reference, you need to
+- Properly comment the function
+- Add it to the quartodoc section in `docs/_quarto.yml`  as shown below
+
+```yml
+quartodoc:
+  # ...
+  sections:
+      # ...
+      contents:
+        # the functions being documented in the package.
+        # you can refer to anything: class methods, modules, etc..
+        # - name: realdata
+        #   children: linked
+
+        - realdata.singlegrain
+
+        # ...
+```
+
+Then you need to create the actual quarto markdown files for the reference from the code base.
+
+```
+conda activate laueotx
+cd docs/
+quartodoc build
+```
+
+
+Then you can rebuild the docs and publish them as described in the previous section.
+
+Note: The API reference is created from the **installed** package not the from the file hierachy. This means, you need to have the laueotx package installed in editable mode. That's the case if you followed the above instructions and installed `laueotx` with `poetry install`.
