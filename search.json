@@ -1,5 +1,40 @@
 [
   {
+    "objectID": "reference/preview.html",
+    "href": "reference/preview.html",
+    "title": "preview",
+    "section": "",
+    "text": "preview(ast, max_depth=999, compact=False, as_string=False)\nPrint a friendly representation of a griffe object (e.g. function, docstring)\n\n\n&gt;&gt;&gt; from quartodoc import get_object\n&gt;&gt;&gt; obj = get_object(\"quartodoc\", \"get_object\")\n&gt;&gt;&gt; preview(obj.docstring.parsed)\n ...\n&gt;&gt;&gt; preview(obj)\n ..."
+  },
+  {
+    "objectID": "reference/preview.html#examples",
+    "href": "reference/preview.html#examples",
+    "title": "preview",
+    "section": "",
+    "text": "&gt;&gt;&gt; from quartodoc import get_object\n&gt;&gt;&gt; obj = get_object(\"quartodoc\", \"get_object\")\n&gt;&gt;&gt; preview(obj.docstring.parsed)\n ...\n&gt;&gt;&gt; preview(obj)\n ..."
+  },
+  {
+    "objectID": "reference/main.html",
+    "href": "reference/main.html",
+    "title": "main",
+    "section": "",
+    "text": "main\nmain()\nmain…"
+  },
+  {
+    "objectID": "reference/realdata.singlegrain.html",
+    "href": "reference/realdata.singlegrain.html",
+    "title": "realdata.singlegrain",
+    "section": "",
+    "text": "realdata.singlegrain(conf, output_dir, verbosity, n_grid, tasks)\nPerform single-grain fitting on part (or full) initialization grid.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory to store the (intermediate) results\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\ndescription\nrequired\n\n\ncalibrate_coniga\nbool\ndescription\nrequired\n\n\ncalibrate_fenimn\nbool\ndescription\nrequired\n\n\ntasks\nlist\ndescription\nrequired"
+  },
+  {
+    "objectID": "reference/realdata.singlegrain.html#parameters",
+    "href": "reference/realdata.singlegrain.html#parameters",
+    "title": "realdata.singlegrain",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory to store the (intermediate) results\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\ndescription\nrequired\n\n\ncalibrate_coniga\nbool\ndescription\nrequired\n\n\ncalibrate_fenimn\nbool\ndescription\nrequired\n\n\ntasks\nlist\ndescription\nrequired"
+  },
+  {
     "objectID": "reference/realdata.compute.html",
     "href": "reference/realdata.compute.html",
     "title": "realdata.compute",
@@ -12,6 +47,104 @@
     "title": "realdata.compute",
     "section": "",
     "text": "Name\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory to store the (intermediate) results\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\ndescription\nrequired\n\n\ncalibrate_coniga\nbool\ndescription\nrequired\n\n\ncalibrate_fenimn\nbool\ndescription\nrequired\n\n\ntasks\nlist\ndescription\nrequired"
+  },
+  {
+    "objectID": "tutorials/realdata.html",
+    "href": "tutorials/realdata.html",
+    "title": "How to work with real data",
+    "section": "",
+    "text": "Before running the below commands make sure you have correctly installed and setup your environment.\nDownload the dataset to tmp directory (create it first). From the base folder run\nlaueotx realdata singlegrain 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata singlegrain 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata multigrain 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nWe will be analysing the merged output of the previous commands\n\nfname = '../../results/realdata_fega10_v10_demo/analyze_sample__fega10_v10__merged.h5'\n\n\nspot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assign, s2s_mod_assign, s2s_obs_assign = plotting.load_sample(fname)\n\n\n\nCode\na_est, x_est = plotting.load_grain_params(fname)\nplotting.plotly_scatter3d_sample(a_est, x_est)\n\n\n\n                                                \n\n\n\n\nCode\nomegas = range(0,360,4)"
+  },
+  {
+    "objectID": "tutorials/realdata.html#computing-files",
+    "href": "tutorials/realdata.html#computing-files",
+    "title": "How to work with real data",
+    "section": "",
+    "text": "Before running the below commands make sure you have correctly installed and setup your environment.\nDownload the dataset to tmp directory (create it first). From the base folder run\nlaueotx realdata singlegrain 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata singlegrain 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata multigrain 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nWe will be analysing the merged output of the previous commands\n\nfname = '../../results/realdata_fega10_v10_demo/analyze_sample__fega10_v10__merged.h5'\n\n\nspot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assign, s2s_mod_assign, s2s_obs_assign = plotting.load_sample(fname)\n\n\n\nCode\na_est, x_est = plotting.load_grain_params(fname)\nplotting.plotly_scatter3d_sample(a_est, x_est)\n\n\n\n                                                \n\n\n\n\nCode\nomegas = range(0,360,4)"
+  },
+  {
+    "objectID": "tutorials/realdata.html#plot-grain-statistics",
+    "href": "tutorials/realdata.html#plot-grain-statistics",
+    "title": "How to work with real data",
+    "section": "Plot grain statistics",
+    "text": "Plot grain statistics\n\n\nCode\nplotting.print_nspots_per_det(inds_obs[1], s2g_obs_assign, tag='detected ')\nplotting.print_nspots_per_det(inds_mod[1], s2g_mod_assign, tag='model    ')\n\n\nspots=detected  total      n_spots=269181 assigned  15978 [5.94%]\nspots=detected  detector=0 n_spots=197047 assigned  13174 [6.69%]\nspots=detected  detector=1 n_spots= 72134 assigned   2804 [3.89%]\nspots=model     total      n_spots= 18977 assigned  15978 [84.20%]\nspots=model     detector=0 n_spots= 15393 assigned  13174 [85.58%]\nspots=model     detector=1 n_spots=  3584 assigned   2804 [78.24%]\n\n\n\n\nCode\nplotting.plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)\n\n\nn_grains=17"
+  },
+  {
+    "objectID": "tutorials/realdata.html#plot-prototype-loss",
+    "href": "tutorials/realdata.html#plot-prototype-loss",
+    "title": "How to work with real data",
+    "section": "Plot prototype loss",
+    "text": "Plot prototype loss\n\n\nCode\nplotting.plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear')"
+  },
+  {
+    "objectID": "tutorials/realdata.html#plot-spots-for-a-given-rotation-angle",
+    "href": "tutorials/realdata.html#plot-spots-for-a-given-rotation-angle",
+    "title": "How to work with real data",
+    "section": "Plot spots for a given rotation angle",
+    "text": "Plot spots for a given rotation angle\n\n\nCode\nplotting.plotly_scatter_spots_assignment_per_angle(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, p_lam=p_lam, omegas=omegas, \n                                                   ind_angle=1, \n                                                   color_obs='darkgrey', \n                                                   lw=0.5, \n                                                   cmap='tab10')"
+  },
+  {
+    "objectID": "tutorials/realdata.html#plot-spots-for-a-given-grain",
+    "href": "tutorials/realdata.html#plot-spots-for-a-given-grain",
+    "title": "How to work with real data",
+    "section": "Plot spots for a given grain",
+    "text": "Plot spots for a given grain\n\n\nCode\nplotting.plotly_scatter_spots_assignment_per_grain(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, spot_obs_assign=s2g_obs_assign, p_lam=p_lam, omegas=omegas, \n                                                   ind_grain=1, \n                                                   color_obs='darkgrey', \n                                                   lw=0.5, \n                                                   cmap='tab10')"
+  },
+  {
+    "objectID": "tutorials/index.html",
+    "href": "tutorials/index.html",
+    "title": "Tutorials",
+    "section": "",
+    "text": "Tutorials\n\nReal data"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
+    "section": "",
+    "text": "LaueOT finds positions and orientations of grains in polycrystalline samples from Bragg’s peaks in white-beam tomographic Laue experiments. The GPU-based algorithm enables fast analysis of samples with thousands of grains and millions of spots.\n\n\nThe inputs to LaueOT are: positions of measured Bragg’s peaks (often called spots) on the detector screen for each projectsion, experiment parameters (detector dimensions, distances to the sample, etc). The outputs are: a list of grains described by their center in 3D, and orientation matrix with respect to the laboratory reference. The analysis can take from few minutes on a single CPU for small problems (thousands of spots) to few hours on large GPUs (millions of spots). Flexible code design enables users to adapt the function to specifics of new problems.\n\n\n\nBelow instructions are meant for Linux/MacOS. On Windows we recommend to use the Windows Subsystem for Linux (WSL).\nWe recommend to use miniconda (Install Instructions) to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.\nTo get started, first clone this repository\ngit clone https://github.com/LaueOT/laueotx/\ncd laueotx\nThen install all required dependencies\nconda create -n laueotx -c conda-forge python=3.10 poetry=1.5\nconda activate laueotx\nconda install -c conda-forge cudatoolkit=11.8.0\npoetry install\nTo enable GPU for your conda environment, you need to configure the system paths. You can do it with the following command every time you start a new terminal after activating your conda environment.\nCUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))\nexport LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH\nFor your convenience it is recommended that you automate it with the following commands. The system paths will be automatically configured when you activate this conda environment.\nmkdir -p $CONDA_PREFIX/etc/conda/activate.d\necho 'CUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\necho 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\nIf there are issues with the GPU, please follow the instructions to install tensorflow\n\n\n\nFor large problems, LaueOT runs in a trivially-parallel mode, by splitting the single-grain fitting step into independent jobs. Those jobs, called singlegrain can be ran at a HPC cluster, for example using Slurm job arrays. The multi-grain fitting step, called multigrain collects the output of single jobs and produces the model of the final sample. An example of the process is shown below.\nDownload the dataset to tmp directory (create it first) and run\nlaueotx realdata singlegrain 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata singlegrain 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata multigrain 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\n\n\n\nYou can find the documentation here\n\n\nThe documentation is made using Quarto. To update the documentation you need to install Quarto. You can render the new website (locally) using the following commands (make sure to have laueotx installed properly):\nconda activate laueotx\ncd docs/\nquarto render\nThe webpage can be published to github pages using the following command. It will also be re-rendered in the process.\nquarto publish gh-pages\n\n\n\nWe are using quartodoc to build the API reference. For every functions (e.g. realdata.singlegrain) that should go into the reference, you need to - Properly comment the function - Add it to the quartodoc section in docs/_quarto.yml as shown below\nquartodoc:\n  # ...\n  sections:\n      # ...\n      contents:\n        # the functions being documented in the package.\n        # you can refer to anything: class methods, modules, etc..\n        # - name: realdata\n        #   children: linked\n\n        - realdata.singlegrain\n\n        # ...\nThen you need to create the actual quarto markdown files for the reference from the code base.\nconda activate laueotx\ncd docs/\nquartodoc build\nThen you can rebuild the docs and publish them as described in the previous section.\nNote: The API reference is created from the installed package not the from the file hierachy. This means, you need to have the laueotx package installed in editable mode. That’s the case if you followed the above instructions and installed laueotx with poetry install."
+  },
+  {
+    "objectID": "index.html#what-can-laueot-do",
+    "href": "index.html#what-can-laueot-do",
+    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
+    "section": "",
+    "text": "The inputs to LaueOT are: positions of measured Bragg’s peaks (often called spots) on the detector screen for each projectsion, experiment parameters (detector dimensions, distances to the sample, etc). The outputs are: a list of grains described by their center in 3D, and orientation matrix with respect to the laboratory reference. The analysis can take from few minutes on a single CPU for small problems (thousands of spots) to few hours on large GPUs (millions of spots). Flexible code design enables users to adapt the function to specifics of new problems."
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
+    "section": "",
+    "text": "Below instructions are meant for Linux/MacOS. On Windows we recommend to use the Windows Subsystem for Linux (WSL).\nWe recommend to use miniconda (Install Instructions) to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.\nTo get started, first clone this repository\ngit clone https://github.com/LaueOT/laueotx/\ncd laueotx\nThen install all required dependencies\nconda create -n laueotx -c conda-forge python=3.10 poetry=1.5\nconda activate laueotx\nconda install -c conda-forge cudatoolkit=11.8.0\npoetry install\nTo enable GPU for your conda environment, you need to configure the system paths. You can do it with the following command every time you start a new terminal after activating your conda environment.\nCUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))\nexport LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH\nFor your convenience it is recommended that you automate it with the following commands. The system paths will be automatically configured when you activate this conda environment.\nmkdir -p $CONDA_PREFIX/etc/conda/activate.d\necho 'CUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\necho 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\nIf there are issues with the GPU, please follow the instructions to install tensorflow"
+  },
+  {
+    "objectID": "index.html#quickstart",
+    "href": "index.html#quickstart",
+    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
+    "section": "",
+    "text": "For large problems, LaueOT runs in a trivially-parallel mode, by splitting the single-grain fitting step into independent jobs. Those jobs, called singlegrain can be ran at a HPC cluster, for example using Slurm job arrays. The multi-grain fitting step, called multigrain collects the output of single jobs and produces the model of the final sample. An example of the process is shown below.\nDownload the dataset to tmp directory (create it first) and run\nlaueotx realdata singlegrain 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata singlegrain 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata multigrain 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000"
+  },
+  {
+    "objectID": "index.html#documentation",
+    "href": "index.html#documentation",
+    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
+    "section": "",
+    "text": "You can find the documentation here\n\n\nThe documentation is made using Quarto. To update the documentation you need to install Quarto. You can render the new website (locally) using the following commands (make sure to have laueotx installed properly):\nconda activate laueotx\ncd docs/\nquarto render\nThe webpage can be published to github pages using the following command. It will also be re-rendered in the process.\nquarto publish gh-pages\n\n\n\nWe are using quartodoc to build the API reference. For every functions (e.g. realdata.singlegrain) that should go into the reference, you need to - Properly comment the function - Add it to the quartodoc section in docs/_quarto.yml as shown below\nquartodoc:\n  # ...\n  sections:\n      # ...\n      contents:\n        # the functions being documented in the package.\n        # you can refer to anything: class methods, modules, etc..\n        # - name: realdata\n        #   children: linked\n\n        - realdata.singlegrain\n\n        # ...\nThen you need to create the actual quarto markdown files for the reference from the code base.\nconda activate laueotx\ncd docs/\nquartodoc build\nThen you can rebuild the docs and publish them as described in the previous section.\nNote: The API reference is created from the installed package not the from the file hierachy. This means, you need to have the laueotx package installed in editable mode. That’s the case if you followed the above instructions and installed laueotx with poetry install."
+  },
+  {
+    "objectID": "reference/realdata.multigrain.html",
+    "href": "reference/realdata.multigrain.html",
+    "title": "realdata.multigrain",
+    "section": "",
+    "text": "realdata.multigrain(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fenimn, tasks, test=False, dict_merged=None)\nPerform multi-grain fitting with Optimal Transport. This function performs the following steps:\n1. collect and merges results from parallelized single-grain fitting runs\n2. perform prototype selection using OT framework\n3. perform multi-grain fitting with OT\nThe optput is a file .h5 with datasets.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory where the single-grain fitting results are stored\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\ndescription\nrequired\n\n\ntasks\nlist\ndescription\nrequired"
+  },
+  {
+    "objectID": "reference/realdata.multigrain.html#parameters",
+    "href": "reference/realdata.multigrain.html#parameters",
+    "title": "realdata.multigrain",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory where the single-grain fitting results are stored\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\ndescription\nrequired\n\n\ntasks\nlist\ndescription\nrequired"
   },
   {
     "objectID": "reference/get_object.html",
@@ -49,122 +182,17 @@
     "text": "Type\nDescription\n\n\n\n\ngriffe.dataclasses.Object\nabc"
   },
   {
-    "objectID": "reference/preview.html",
-    "href": "reference/preview.html",
-    "title": "preview",
-    "section": "",
-    "text": "preview(ast, max_depth=999, compact=False, as_string=False)\nPrint a friendly representation of a griffe object (e.g. function, docstring)\n\n\n&gt;&gt;&gt; from quartodoc import get_object\n&gt;&gt;&gt; obj = get_object(\"quartodoc\", \"get_object\")\n&gt;&gt;&gt; preview(obj.docstring.parsed)\n ...\n&gt;&gt;&gt; preview(obj)\n ..."
-  },
-  {
-    "objectID": "reference/preview.html#examples",
-    "href": "reference/preview.html#examples",
-    "title": "preview",
-    "section": "",
-    "text": "&gt;&gt;&gt; from quartodoc import get_object\n&gt;&gt;&gt; obj = get_object(\"quartodoc\", \"get_object\")\n&gt;&gt;&gt; preview(obj.docstring.parsed)\n ...\n&gt;&gt;&gt; preview(obj)\n ..."
-  },
-  {
-    "objectID": "tutorials/realdata.html",
-    "href": "tutorials/realdata.html",
-    "title": "How to work with real data",
-    "section": "",
-    "text": "Before running the below commands make sure you have correctly installed and setup your environment.\nDownload the dataset to tmp directory (create it first). From the base folder run\nlaueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nWe will be analysing the merged output of the previous commands\n\nfname = '../../results/realdata_fega10_v10_demo/analyze_sample__fega10_v10__merged.h5'\n\n\nspot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assign, s2s_mod_assign, s2s_obs_assign = plotting.load_sample(fname)\n\n\n\nCode\na_est, x_est = plotting.load_grain_params(fname)\nplotting.plotly_scatter3d_sample(a_est, x_est)\n\n\n\n                                                \n\n\n\n\nCode\nomegas = range(0,360,4)"
-  },
-  {
-    "objectID": "tutorials/realdata.html#computing-files",
-    "href": "tutorials/realdata.html#computing-files",
-    "title": "How to work with real data",
-    "section": "",
-    "text": "Before running the below commands make sure you have correctly installed and setup your environment.\nDownload the dataset to tmp directory (create it first). From the base folder run\nlaueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nWe will be analysing the merged output of the previous commands\n\nfname = '../../results/realdata_fega10_v10_demo/analyze_sample__fega10_v10__merged.h5'\n\n\nspot_loss, s_obs, s_mod, inds_mod, inds_obs, p_lam, s2g_mod_assign, s2g_obs_assign, s2s_mod_assign, s2s_obs_assign = plotting.load_sample(fname)\n\n\n\nCode\na_est, x_est = plotting.load_grain_params(fname)\nplotting.plotly_scatter3d_sample(a_est, x_est)\n\n\n\n                                                \n\n\n\n\nCode\nomegas = range(0,360,4)"
-  },
-  {
-    "objectID": "tutorials/realdata.html#plot-grain-statistics",
-    "href": "tutorials/realdata.html#plot-grain-statistics",
-    "title": "How to work with real data",
-    "section": "Plot grain statistics",
-    "text": "Plot grain statistics\n\n\nCode\nplotting.print_nspots_per_det(inds_obs[1], s2g_obs_assign, tag='detected ')\nplotting.print_nspots_per_det(inds_mod[1], s2g_mod_assign, tag='model    ')\n\n\nspots=detected  total      n_spots=269181 assigned  15698 [5.83%]\nspots=detected  detector=0 n_spots=197047 assigned  12959 [6.58%]\nspots=detected  detector=1 n_spots= 72134 assigned   2739 [3.80%]\nspots=model     total      n_spots= 18889 assigned  15698 [83.11%]\nspots=model     detector=0 n_spots= 15363 assigned  12959 [84.35%]\nspots=model     detector=1 n_spots=  3526 assigned   2739 [77.68%]\n\n\n\n\nCode\nplotting.plotly_grain_stats(s2s_mod_assign, s2s_obs_assign, s2g_mod_assign, s2g_obs_assign, s_obs, s_mod, inds_mod, inds_obs)\n\n\nn_grains=17"
-  },
-  {
-    "objectID": "tutorials/realdata.html#plot-prototype-loss",
-    "href": "tutorials/realdata.html#plot-prototype-loss",
-    "title": "How to work with real data",
-    "section": "Plot prototype loss",
-    "text": "Plot prototype loss\n\n\nCode\nplotting.plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear')"
-  },
-  {
-    "objectID": "tutorials/realdata.html#plot-spots-for-a-given-rotation-angle",
-    "href": "tutorials/realdata.html#plot-spots-for-a-given-rotation-angle",
-    "title": "How to work with real data",
-    "section": "Plot spots for a given rotation angle",
-    "text": "Plot spots for a given rotation angle\n\n\nCode\nplotting.plotly_scatter_spots_assignment_per_angle(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, p_lam=p_lam, omegas=omegas, \n                                                   ind_angle=1, \n                                                   color_obs='darkgrey', \n                                                   lw=0.5, \n                                                   cmap='tab10')"
-  },
-  {
-    "objectID": "tutorials/realdata.html#plot-spots-for-a-given-grain",
-    "href": "tutorials/realdata.html#plot-spots-for-a-given-grain",
-    "title": "How to work with real data",
-    "section": "Plot spots for a given grain",
-    "text": "Plot spots for a given grain\n\n\nCode\nplotting.plotly_scatter_spots_assignment_per_grain(s_obs=s_obs, inds_obs=inds_obs, s_mod=s_mod, inds_mod=inds_mod, spot_mod_assign=s2g_mod_assign, spot_obs_assign=s2g_obs_assign, p_lam=p_lam, omegas=omegas, \n                                                   ind_grain=1, \n                                                   color_obs='darkgrey', \n                                                   lw=0.5, \n                                                   cmap='tab10')"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
-    "section": "",
-    "text": "LaueOT finds positions and orientations of grains in polycrystalline samples from Bragg’s peaks in white-beam tomographic Laue experiments. The GPU-based algorithm enables fast analysis of samples with thousands of grains and millions of spots.\n\n\nThe inputs to LaueOT are: positions of measured Bragg’s peaks (often called spots) on the detector screen for each projectsion, experiment parameters (detector dimensions, distances to the sample, etc). The outputs are: a list of grains described by their center in 3D, and orientation matrix with respect to the laboratory reference. The analysis can take from few minutes on a single CPU for small problems (thousands of spots) to few hours on large GPUs (millions of spots). Flexible code design enables users to adapt the function to specifics of new problems.\n\n\n\nBelow instructions are meant for Linux/MacOS. On Windows we recommend to use the Windows Subsystem for Linux (WSL).\nWe recommend to use miniconda (Install Instructions) to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.\nTo get started, first clone this repository\ngit clone https://github.com/LaueOT/laueotx/\ncd laueotx\nThen install all required dependencies\nconda create -n laueotx -c conda-forge python=3.10 poetry=1.5\nconda activate laueotx\nconda install -c conda-forge cudatoolkit=11.8.0\npoetry install\nTo enable GPU for your conda environment, you need to configure the system paths. You can do it with the following command every time you start a new terminal after activating your conda environment.\nCUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))\nexport LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH\nFor your convenience it is recommended that you automate it with the following commands. The system paths will be automatically configured when you activate this conda environment.\nmkdir -p $CONDA_PREFIX/etc/conda/activate.d\necho 'CUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\necho 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\nIf there are issues with the GPU, please follow the instructions to install tensorflow\n\n\n\nFor large problems, LaueOT runs in a trivially-parallel mode, by splitting the single-grain fitting step into independent jobs. Those jobs, called compute can be ran at a HPC cluster, for example using Slurm job arrays. The multi-grain fitting step, called merge collects the output of single jobs and produces the model of the final sample. An example of the process is shown below.\nDownload the dataset to tmp directory (create it first) and run\nlaueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\n\n\n\nYou can find the documentation here\n\n\nThe documentation is made using Quarto. To update the documentation you need to install Quarto. You can render the new website (locally) using the following commands (make sure to have laueotx installed properly):\nconda activate laueotx\ncd docs/\nquarto render\nThe webpage can be published to github pages using the following command. It will also be re-rendered in the process.\nquarto publish gh-pages"
-  },
-  {
-    "objectID": "index.html#what-can-laueot-do",
-    "href": "index.html#what-can-laueot-do",
-    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
-    "section": "",
-    "text": "The inputs to LaueOT are: positions of measured Bragg’s peaks (often called spots) on the detector screen for each projectsion, experiment parameters (detector dimensions, distances to the sample, etc). The outputs are: a list of grains described by their center in 3D, and orientation matrix with respect to the laboratory reference. The analysis can take from few minutes on a single CPU for small problems (thousands of spots) to few hours on large GPUs (millions of spots). Flexible code design enables users to adapt the function to specifics of new problems."
-  },
-  {
-    "objectID": "index.html#installation",
-    "href": "index.html#installation",
-    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
-    "section": "",
-    "text": "Below instructions are meant for Linux/MacOS. On Windows we recommend to use the Windows Subsystem for Linux (WSL).\nWe recommend to use miniconda (Install Instructions) to create a virtual environment for your project. This virtual environment is used to install all required GPU dependencies.\nTo get started, first clone this repository\ngit clone https://github.com/LaueOT/laueotx/\ncd laueotx\nThen install all required dependencies\nconda create -n laueotx -c conda-forge python=3.10 poetry=1.5\nconda activate laueotx\nconda install -c conda-forge cudatoolkit=11.8.0\npoetry install\nTo enable GPU for your conda environment, you need to configure the system paths. You can do it with the following command every time you start a new terminal after activating your conda environment.\nCUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))\nexport LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH\nFor your convenience it is recommended that you automate it with the following commands. The system paths will be automatically configured when you activate this conda environment.\nmkdir -p $CONDA_PREFIX/etc/conda/activate.d\necho 'CUDNN_PATH=$(dirname $(python -c \"import nvidia.cudnn;print(nvidia.cudnn.__file__)\"))' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\necho 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh\nIf there are issues with the GPU, please follow the instructions to install tensorflow"
-  },
-  {
-    "objectID": "index.html#quickstart",
-    "href": "index.html#quickstart",
-    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
-    "section": "",
-    "text": "For large problems, LaueOT runs in a trivially-parallel mode, by splitting the single-grain fitting step into independent jobs. Those jobs, called compute can be ran at a HPC cluster, for example using Slurm job arrays. The multi-grain fitting step, called merge collects the output of single jobs and produces the model of the final sample. An example of the process is shown below.\nDownload the dataset to tmp directory (create it first) and run\nlaueotx realdata compute 0 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata compute 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000\nlaueotx realdata merge 0 1 --conf tmp/config_realdata_fega10_v10_demo.yaml -o results/realdata_fega10_v10_demo/ --n-grid 1000"
-  },
-  {
-    "objectID": "index.html#documentation",
-    "href": "index.html#documentation",
-    "title": "LaueOT: a fast optimal transport -based algorithm for indexing polycrystalline sample from Laue experiments",
-    "section": "",
-    "text": "You can find the documentation here\n\n\nThe documentation is made using Quarto. To update the documentation you need to install Quarto. You can render the new website (locally) using the following commands (make sure to have laueotx installed properly):\nconda activate laueotx\ncd docs/\nquarto render\nThe webpage can be published to github pages using the following command. It will also be re-rendered in the process.\nquarto publish gh-pages"
-  },
-  {
-    "objectID": "tutorials/index.html",
-    "href": "tutorials/index.html",
-    "title": "Tutorials",
-    "section": "",
-    "text": "Tutorials\n\nReal data"
-  },
-  {
-    "objectID": "reference/main.html",
-    "href": "reference/main.html",
-    "title": "main",
-    "section": "",
-    "text": "main\nmain()\nmain…"
-  },
-  {
     "objectID": "reference/index.html",
     "href": "reference/index.html",
     "title": "Function reference",
     "section": "",
-    "text": "Real data application\n\n\n\nrealdata.compute\nCompute the main algorithm"
+    "text": "Real data application\n\n\n\nrealdata.singlegrain\nPerform single-grain fitting on part (or full) initialization grid.\n\n\nrealdata.multigrain\nPerform multi-grain fitting with Optimal Transport."
   },
   {
     "objectID": "reference/index.html#application-functions",
     "href": "reference/index.html#application-functions",
     "title": "Function reference",
     "section": "",
-    "text": "Real data application\n\n\n\nrealdata.compute\nCompute the main algorithm"
+    "text": "Real data application\n\n\n\nrealdata.singlegrain\nPerform single-grain fitting on part (or full) initialization grid.\n\n\nrealdata.multigrain\nPerform multi-grain fitting with Optimal Transport."
   }
 ]
