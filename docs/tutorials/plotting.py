@@ -4,7 +4,6 @@ from collections import OrderedDict
 import seaborn
 import plotting
 
-
 def mm_to_pix(s, n_pix=2000, det_length=412):
     s_pix = s.copy()
     s_pix[:,1:] += det_length/2

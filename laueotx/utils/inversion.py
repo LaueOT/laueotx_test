@@ -10,7 +10,6 @@ n_dim = 3
 sample_size = 4 
 rot_lim = 1
 
-
 def get_Llab(gr, det_tilt, det_pos, grain_rot, grain_pos, rotation_type='rp'):
     gr.beamline.detectors.rotate_and_shift(det_tilt, det_pos)
     gr.set_orientation(grain_rot)
