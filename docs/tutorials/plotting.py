@@ -277,70 +277,6 @@ def plot_spot_statistics(fname, print_stats=False):
         for i in range(len(ang)):
             print(i, n_per_ang_det0[i], n_per_ang_det1[i])
 
-
-# def plot_spot_loss_plotly(fname, n_max=None, xscale='linear', yscale='linear'):    
-
-#     import h5py
-#     import numpy as np
-#     import plotly.express as px
-#     import plotly.graph_objects as go
-
-#     with h5py.File(fname, 'r') as f:
-#         spot_loss = np.array(f['spot_loss'])
-
-#     spot_loss_diff = lambda spot_loss: spot_loss[1:] / spot_loss[:-1]
-#     x = np.arange(len(spot_loss))
-#     y = spot_loss - np.min(spot_loss)
-#     y = y / np.max(y)
-
-#     min_y = 1e-3
-
-#     fig = go.Figure()
-
-#     # Create subplots
-#     fig.add_trace(go.Scatter(x=x, y=spot_loss, mode='markers', name='SPOT loss'))
-#     fig.add_trace(go.Scatter(x=x, y=y, mode='markers', name='SPOT loss (normalized)'))
-#     fig.add_trace(go.Scatter(x=x[1:], y=np.diff(y, n=1), mode='markers', name='SPOT loss frac diff'))
-#     fig.add_trace(go.Scatter(x=x, y=spot_loss_diff(spot_loss), mode='markers', name='SPOT loss diff'))
-
-#     # Add horizontal lines
-#     fig.add_shape(go.layout.Shape(
-#         type="line",
-#         x0=0,
-#         x1=n_max if n_max else len(spot_loss),
-#         y0=min_y,
-#         y1=min_y,
-#         line=dict(color="red", dash="dash"),
-#     ))
-#     fig.add_shape(go.layout.Shape(
-#         type="line",
-#         x0=0,
-#         x1=n_max if n_max else len(spot_loss),
-#         y0=-min_y,
-#         y1=-min_y,
-#         line=dict(color="red", dash="dash"),
-#     ))
-
-#     # Update axis properties
-#     fig.update_xaxes(title_text='prototype index', range=[0, n_max] if n_max else None, type=xscale)
-#     fig.update_yaxes(title_text='SPOT loss', type=yscale)
-
-#     # Set layout options
-#     fig.update_layout(
-#         width=ny * 8,
-#         height=nx * 6,
-#         title_text='SPOT Loss Analysis',
-#         legend=dict(x=0, y=1),
-#         grid=dict(yaxis=dict(showgrid=True, zeroline=False, showline=True)),
-#     )
-
-#     # Show the plot
-#     fig.show()
-
-# Example usage:
-# plot_spot_loss('your_file_name.h5', n_max=100, xscale='linear', yscale='linear')
-
-
 def plot_spot_loss(fname, n_max=None, xscale='linear', yscale='linear'):
 
     with h5py.File(fname, 'r') as f:
@@ -541,7 +477,7 @@ def plotly_scatter3d_sample(a_est, x_est, a_max=0.2, alpha=1, suptitle='', plot_
     fig.update_layout(margin=dict(l=0.1, r=0.1, b=0.1, t=0.1), 
                       width=plot_size*1.2,
                       height=plot_size,
-                      scene=dict(xaxis_title='position x [mm]', yaxis_title='position y [mm]', zaxis_title='position y [mm]'), 
+                      scene=dict(xaxis_title='position x [mm]', yaxis_title='position y [mm]', zaxis_title='position z [mm]'), 
                       title={'text':suptitle, 'xanchor': 'center', 'yanchor': 'top', 'y':0.9, 'x':0.5})
     
     
@@ -801,10 +737,6 @@ def plotly_scatter_spots_assignment_per_angle(s_obs, inds_obs, s_mod, inds_mod, 
     fig.show()
     
 
-
-
-
-
 def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, spot_mod_assign, spot_obs_assign, ind_grain, p_lam, marker_size=10, omegas=None, color_obs='darkgrey', cmap='tab10', plot_size=500,  **kw):
     # print('lol')
 
@@ -904,11 +836,6 @@ def plotly_scatter_spots_assignment_per_grain(s_obs, inds_obs, s_mod, inds_mod, 
     fig.show()
     
 
-    
-
-    
-    
-
 def plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear', plot_size=500):
     
     import h5py
@@ -953,4 +880,70 @@ def plotly_spot_loss(fname, n_max=None, xscale='linear', yscale='linear', plot_s
     # # Show the plot
     fig.show()
 
+
+
+
+
+
+# def plot_spot_loss_plotly(fname, n_max=None, xscale='linear', yscale='linear'):    
+
+#     import h5py
+#     import numpy as np
+#     import plotly.express as px
+#     import plotly.graph_objects as go
+
+#     with h5py.File(fname, 'r') as f:
+#         spot_loss = np.array(f['spot_loss'])
+
+#     spot_loss_diff = lambda spot_loss: spot_loss[1:] / spot_loss[:-1]
+#     x = np.arange(len(spot_loss))
+#     y = spot_loss - np.min(spot_loss)
+#     y = y / np.max(y)
+
+#     min_y = 1e-3
+
+#     fig = go.Figure()
+
+#     # Create subplots
+#     fig.add_trace(go.Scatter(x=x, y=spot_loss, mode='markers', name='SPOT loss'))
+#     fig.add_trace(go.Scatter(x=x, y=y, mode='markers', name='SPOT loss (normalized)'))
+#     fig.add_trace(go.Scatter(x=x[1:], y=np.diff(y, n=1), mode='markers', name='SPOT loss frac diff'))
+#     fig.add_trace(go.Scatter(x=x, y=spot_loss_diff(spot_loss), mode='markers', name='SPOT loss diff'))
+
+#     # Add horizontal lines
+#     fig.add_shape(go.layout.Shape(
+#         type="line",
+#         x0=0,
+#         x1=n_max if n_max else len(spot_loss),
+#         y0=min_y,
+#         y1=min_y,
+#         line=dict(color="red", dash="dash"),
+#     ))
+#     fig.add_shape(go.layout.Shape(
+#         type="line",
+#         x0=0,
+#         x1=n_max if n_max else len(spot_loss),
+#         y0=-min_y,
+#         y1=-min_y,
+#         line=dict(color="red", dash="dash"),
+#     ))
+
+#     # Update axis properties
+#     fig.update_xaxes(title_text='prototype index', range=[0, n_max] if n_max else None, type=xscale)
+#     fig.update_yaxes(title_text='SPOT loss', type=yscale)
+
+#     # Set layout options
+#     fig.update_layout(
+#         width=ny * 8,
+#         height=nx * 6,
+#         title_text='SPOT Loss Analysis',
+#         legend=dict(x=0, y=1),
+#         grid=dict(yaxis=dict(showgrid=True, zeroline=False, showline=True)),
+#     )
+
+#     # Show the plot
+#     fig.show()
+
+# Example usage:
+# plot_spot_loss('your_file_name.h5', n_max=100, xscale='linear', yscale='linear')
 

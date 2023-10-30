@@ -1,43 +1,43 @@
-import os, sys, warnings, argparse, h5py, numpy as np, time, itertools, random, shutil, datetime
+# key packages imports
+import os, sys, warnings, argparse, h5py, numpy as np, time, itertools, random, shutil, datetime, click
+from copy import deepcopy
+from collections import OrderedDict
+from tqdm.auto import trange, tqdm
+from pathlib import Path 
+
 
 # tensorflow imports and settings
 import tensorflow as tf
 tf.config.set_soft_device_placement(False)
 tf.config.run_functions_eagerly(True)
 physical_devices = tf.config.list_physical_devices('GPU')
-print(physical_devices)
 tf.debugging.set_log_device_placement(False)
 
-# from fastlaue3dnd import *
-from collections import OrderedDict
+# laueotx imports
 from laueotx.utils import logging as utils_logging
 from laueotx.utils import io as utils_io
 from laueotx.utils import config as utils_config
 from laueotx import laue_math, laue_math_tensorised, laue_math_graph, assignments
 from laueotx.detector import Detector
 from laueotx.beamline import Beamline
-# from fastlaue3dnd.filenames import *
-from laueotx.filenames import get_filename_realdata_part,get_filename_realdata_merged
+from laueotx.filenames import get_filename_realdata_part, get_filename_realdata_merged
 from laueotx.grain import Grain
 from laueotx.laue_rotation import Rotation
-from tqdm.auto import trange, tqdm
-from pathlib import Path 
 
+# warnings and logger
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 warnings.filterwarnings('ignore', category=RuntimeWarning)
 warnings.filterwarnings('once', category=UserWarning)
-
 LOGGER = utils_logging.get_logger(__file__)
 
+# constants
 FLAG_OUTLIER = -999999
 astr = lambda x: np.array2string(np.atleast_1d(x), max_line_width=1000, precision=5, formatter={'all': lambda x: '{: 2.6f}'.format(x)})
 astr3 = lambda x: np.array2string(np.atleast_1d(x), max_line_width=1000, precision=3, formatter={'all': lambda x: '{: 6.3f}'.format(x)})
 mse = lambda x, y: np.mean((x - y)**2)
 rms = lambda x, y: np.sqrt(np.mean((x - y)**2))
-sinkhorn_method = {'softslacks': 'sinkhorn_slacks_sparse', 'softent': 'sinkhorn_unbalanced_sparse'}
+# sinkhorn_method = {'softslacks': 'sinkhorn_slacks_sparse', 'softent': 'sinkhorn_unbalanced_sparse'}
 
-import click
-from copy import deepcopy
 
 import functools
 def common_options(f):
@@ -45,8 +45,8 @@ def common_options(f):
     @click.option('output_dir','--output-dir', "-o", required=True,type=str, show_default=True,help='Directory to store the produced files') # type=click.Path(), 
     @click.option('--verbosity','-v', type=click.Choice( ['critical', 'error', 'warning', 'info', 'debug']), default="info", show_default=True,help='Logging level')
     @click.option('--n-grid', default=2000, show_default=True,help='number of grid points from which to initialize coordinate descent')
-    @click.option("--calibrate-coniga/--no-calibrate-coninga",default=False, help="Calibrate the coniga sample")
-    @click.option("--calibrate-fenimn/--no-calibrate-fenimn", default=False, help="Calibrate the fenimn sample")
+    # @click.option("--calibrate-coniga/--no-calibrate-coninga",default=False, help="Calibrate the coniga sample")
+    # @click.option("--calibrate-fenimn/--no-calibrate-fenimn", default=False, help="Calibrate the fenimn sample")
     @functools.wraps(f)
     def wrapper_common_options(*args, **kwargs):
         return f(*args, **kwargs)
@@ -62,6 +62,9 @@ def main():
 @click.argument("tasks", nargs=-1)
 def singlegrain(conf: str | Path, output_dir: str, verbosity: bool, n_grid: int, tasks: list):
     """Perform single-grain fitting on part (or full) initialization grid.
+    This will follow these steps:
+        1. Create a grid of initial points in the grain position-orientation space
+        2. For each point, it will run a single-grain coordinate descent to find the best values of these parameters, jointly with spot assignments
     
 
     Parameters
@@ -73,159 +76,101 @@ def singlegrain(conf: str | Path, output_dir: str, verbosity: bool, n_grid: int,
     verbosity : bool
         Verbosity level for printing to console
     n_grid : int
-        _description_
-    calibrate_coniga : bool
-        _description_
-    calibrate_fenimn : bool
-        _description_
+        Number of single-grain initialial guesses per task. They will be distributed using a Sobol sequence inside the grain position and orientation space.
     tasks : list
-        _description_
+        List of integer task ids to use. Each task will compute n_grid single-grain fitting solutions. The starting points will be created using Sobol points with indices `(task_id * n_grid):((task_id+1) * n_grid)`.
+
+    Returns
+    -------
+    output
+
+
     """
+
+    # type-proff indices
     indices = [int(i) for i in tasks]
 
-
+    # read args
     args = {} # TODO: implement additional arguments from commandline using click
     args = argparse.Namespace(**args)
-    # res = resources(args)
-    # args = setup(args)
-
     utils_logging.set_all_loggers_level(verbosity)
 
+    # read config and make output dirs
     conf = utils_io.get_abs_path(conf)
     output_dir = utils_io.get_abs_path(output_dir)
     utils_io.robust_makedirs(output_dir)
-
     conf = utils_io.read_config(conf, args)
 
+    # find experiment rotation (projection) angles
     omegas = utils_config.get_angles(conf['angles'])
     LOGGER.info(f'got {len(omegas)} angles')
 
+    # set up detectors and beamline
     dt = get_detectors_from_config(conf)
-
     bl = Beamline(omegas=omegas, 
                   detectors=dt,
                   lambda_lim=[conf['beam']['lambda_min'], conf['beam']['lambda_max']])
 
-
+    # read input peaks data
     mpd = get_peaskdata_from_config(conf, bl)
 
+    # loop over tasks
     for index in indices:
+
         LOGGER.info(f'=================> running on index {index} / {str(indices)}')
+        
+        # main analysis
         dict_out = analyse(n_grid, deepcopy(conf), mpd, index, test=False)
+
+        # store output
         filename_out = get_filename_realdata_part(output_dir, tag=conf['tag'], index=index)
         utils_io.write_arrays(filename_out, **dict_out)
 
 
 
-def setup(args):
-
-    if type(args) is not list: 
-        return args
-
-    description = 'Run compression benchmarks for climate simulations'
-    parser = argparse.ArgumentParser(description=description, add_help=True)
-    parser.add_argument('-v', '--verbosity', type=str, default='info', choices=('critical', 'error', 'warning', 'info', 'debug'), 
-                        help='logging level')
-    parser.add_argument('--conf', type=str, required=True, 
-                        help='configuration yaml file')
-    parser.add_argument('--dir_out', type=str, required=True, 
-                        help='output dir')
-    parser.add_argument('--params_ot', type=str, default=None,
-                        help='parameters for the OT, string will be parsed, format: --params_ot=key1=value1,key2=value2')
-    parser.add_argument('--test', action='store_true',
-                        help='test mode')
-    parser.add_argument('--n_grid', type=int, default=2000,
-                        help='number of grid points from which to initialize coordinate descent')
-    parser.add_argument('--calibrate_coniga', action='store_true',
-                        help='if to calibrate the coniga sample')
-    parser.add_argument('--calibrate_fenimn', action='store_true',
-                        help='if to calibrate the fenimn sample')
-
-    args, _ = parser.parse_known_args(args)
-    utils_logging.set_all_loggers_level(args.verbosity)
+def analyse(n_grid, conf, mpd, index=0, test=False):
+    """Run single-grain fitting function for a given index. Output the optimized parameters of grains.
     
-    args.conf = utils_io.get_abs_path(args.conf)
-    args.dir_out = utils_io.get_abs_path(args.dir_out)
-    utils_io.robust_makedirs(args.dir_out)
-
-    return args
-
-def resources(args):
-
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--queue', type=str, default='gwen_short', choices=('gwen_short', 'gwen', 'gpu'))
-    argk, _ = parser.parse_known_args(args)
+    Parameters
+    ----------
+    n_grid : int
+        Number of starting points to use.
+    conf : TYPE
+        Configuration dictionary.
+    mpd : from laueotx.peaks_data.MultidetectorPeaksData
+        Multi-detector peaks data containing the detected peaks positions.
+    index : int, optional
+        Index of the task to process. Each task will compute n_grid single-grain fitting solutions. The starting points will be created using Sobol points with indices `(index * n_grid):((index+1) * n_grid)`.
+    test : bool, optional
+        Test mode.
     
-    res = dict(main_memory=4000,
-               main_time_per_index=1, # hours
-               main_nproc=4,
-               main_scratch=6500,
-               main_ngpu=1,
-               merge_ngpu=2,
-               merge_time=1) # hours
-
-    if argk.queue == 'gwen_short':
-
-        res['main_time_per_index']=2 # hours
-        res['main_ngpu']=1
-        res['main_nproc']=16*res['main_ngpu']
-        res['main_memory']=3900*res['main_nproc']
-        res['pass'] = {'cluster':'gmerlin6', 'account':'gwendolen', 'partition':'gwendolen', 'gpus-per-task':res['main_ngpu'], 'cpus-per-gpu':16}
-        res['main_nsimult'] = 5
-        res['merge_ngpu']=1
-        res['merge_nproc']=16*res['main_ngpu']
-        res['merge_memory']=3900*res['main_nproc']
-
-
-    elif argk.queue == 'gwen':
-
-        res['main_time_per_index']=8 # hours
-        res['main_ngpu']=4
-        res['main_nproc']=16*res['main_ngpu']
-        res['main_memory']=3900*res['main_nproc']
-        res['pass'] = {'cluster':'gmerlin6', 'account':'gwendolen', 'partition':'gwendolen-long', 'gpus-per-task':res['main_ngpu'], 'cpus-per-gpu':16}
-
-    elif argk.queue == 'gpu':
-
-        res['main_time_per_index']=24 # hours
-        res['main_ngpu']=1
-        res['main_nproc']=4
-        res['main_memory']=4000*res['main_nproc']
-        res['pass'] = {'cluster':'gmerlin6', 'partition':'gpu', 'gpus-per-task':res['main_ngpu'], 'cpus-per-gpu':4}
-
-
-    return res
-
-
-
-def analyse(n_grid,conf, mpd, index=0, test=False):
-    
+    Returns
+    -------
+    TYPE
+        Description
+    """
     from laueotx import laue_coordinate_descent
     from laueotx.utils import inversion as utils_inversion
     from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, select_indices, merge_duplicated_spots, get_sobol_grid_laue
-    
     from laueotx.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup_all
-    from laueotx.laue_rotation import get_rotation_constraint_rf
+    from laueotx.laue_rotation import get_rotation_constraint_rf, get_max_rf
     from laueotx.spot_prototype_selection import remove_candidates_with_bad_fits, prune_similar_solutions
     from laueotx.deterministic_annealing import get_neighbour_stats, get_single_optimization_control_params
 
     # get observed data
-
     s_obs = mpd.to_lab_coords()
-    # n_dim = 3
-    # s_obs = np.zeros((len(mpd.peaks), n_dim))
-    # s_obs[:,1] = mpd.peaks['x']
-    # s_obs[:,2] = mpd.peaks['y']
+    n_trials = int(n_grid)
 
+    # re-case indices of angles and detectors
     def prep_inds(x):
         x = np.array(x).reshape(-1,1)
         x = np.unique(x, return_inverse=True)[1][:,np.newaxis]
         return x 
-    
+        
+    # read indices of rotation angles and detectors
     i_det_obs = prep_inds(mpd.peaks['id_detector'])
     i_ang_obs = prep_inds(mpd.peaks['id_angle'])
-    frac_outliers = 0
+    # frac_outliers = 0
 
     base_a, base_x, max_grain_pos, max_grain_rot = get_experimental_sample_params(deepcopy(conf))
 
@@ -234,20 +179,18 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
     # base_a = base_a[[select_grain]]
     # base_x = base_x[[select_grain]]
 
-    n_grains_obs = len(base_a)
-    n_trials = int(n_grid)
-    n_grn_sample = len(base_a)
-    n_detectors = len(np.unique(i_det_obs))
+    # input-proof
+    # n_grains_obs = len(base_a)
+    # n_grn_sample = len(base_a)
 
     # render spots from the previously measured grain parameters
-
-    sample = polycrystalline_sample(deepcopy(conf), hkl_sign_redundancy=True, rotation_type='mrp')
-    sample.set_tensor_variables(base_a, base_x)
-    i_grn, i_ang, i_hkl, i_det, i_all = sample.get_batch_indices_full(n_grn=n_grn_sample)
-    s_lab, p_sample, p_lam, select_sample = sample.get_spots_batch(reference_frame='laboratory')
-    # s_lab, p_sample, p_lam, select_sample = sample.get_spots_batch(reference_frame='detector')
-    s_lab, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample = select_indices(select_sample, s_lab, i_grn, i_ang, i_hkl, i_det, i_all)
-    s_lab, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample, select_merged = merge_duplicated_spots(s_lab, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample, decimals=4, return_index=True, split_by_grain=True)
+    # sample = polycrystalline_sample(deepcopy(conf), hkl_sign_redundancy=True, rotation_type='mrp')
+    # sample.set_tensor_variables(base_a, base_x)
+    # i_grn, i_ang, i_hkl, i_det, i_all = sample.get_batch_indices_full(n_grn=n_grn_sample)
+    # s_lab, p_sample, p_lam, select_sample = sample.get_spots_batch(reference_frame='laboratory')
+    # # s_lab, p_sample, p_lam, select_sample = sample.get_spots_batch(reference_frame='detector')
+    # s_lab, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample = select_indices(select_sample, s_lab, i_grn, i_ang, i_hkl, i_det, i_all)
+    # s_lab, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample, select_merged = merge_duplicated_spots(s_lab, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample, decimals=4, return_index=True, split_by_grain=True)
 
     # p_lam_sample = np.tile(np.expand_dims(p_lam, axis=-1), [1, 1, 1, n_detectors])[select_sample]
     # p_lam_merged = p_lam_sample[select_merged]
@@ -289,33 +232,20 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
     nn_lookup_ind = tf.constant(snl.nn_lookup_ind.numpy(), dtype=tf.int32)
     lookup_pixel_size=snl.detector_side_length/snl.lookup_n_pix
     lookup_n_pix=snl.lookup_n_pix
-    i_nn = nn_lookup_all(nn_lookup_ind, s_obs, s_lab, i_ang_sample, i_det_sample, i_grn_sample, lookup_pixel_size, lookup_n_pix)
+    # i_nn = nn_lookup_all(nn_lookup_ind, s_obs, s_lab, i_ang_sample, i_det_sample, i_grn_sample, lookup_pixel_size, lookup_n_pix)
 
     # get trials grid
-    sobol_samples = tf.math.sobol_sample(dim=6, num_results=n_trials*2, skip=index*n_trials*2, dtype=tf.float64).numpy()*2 -1 # numbers between -1 and 1
-    rot_grid = sobol_samples[:,0:3] * max_grain_rot
-    pos_grid = sobol_samples[:,3:6] * max_grain_pos
-    select_rot_constraint = get_rotation_constraint_rf(rot_grid)
+    sobol_samples = tf.math.sobol_sample(dim=6, num_results=n_trials*2, skip=index*n_trials*2, dtype=tf.float64).numpy()*2 -1 # numbers between -1 and 1, start with more trials to make sure there is enough samples after rotation constraints is satisfied
+    rot_grid = sobol_samples[:,0:3] * get_max_rf(laue_group=conf['sample']['laue_group'])
+    pos_grid = sobol_samples[:,3:6] * float(conf['sample']['size'])
+    select_rot_constraint = get_rotation_constraint_rf(rot_grid, laue_group=conf['sample']['laue_group']) # TODO: make this more efficient, with respect to the Sobol sampling above
     rot_grid = rot_grid[select_rot_constraint][:n_trials]
     pos_grid = pos_grid[select_rot_constraint][:n_trials]
     rot_grid = Rotation.from_gibbs(rot_grid).as_mrp()
-
-    # LOGGER.warning('using truth values for testing!')
-    # rot_grid = rot_grid*0.001 + base_a 
-    # pos_grid = pos_grid*0.01 + base_x 
-    # rot_grid = rot_grid*0.0 + np.array([0.116853, -0.181091, -0.136512])
-    # pos_grid = pos_grid*0.0 + np.array([0.070181,  2.358819,  0.49269])
-    # rot_grid = rot_grid*0.001 + base_a[np.random.choice(n_grains_obs, rot_grid.shape[0])]
-    # pos_grid = pos_grid*0.01 + base_x[np.random.choice(n_grains_obs, pos_grid.shape[0])]
-    # rot_grid = rot_grid*0.001 + base_a[[1]]
-    # pos_grid = pos_grid*0.01 + base_x[[1]]
-
-
     LOGGER.info(f'created rot_grid {rot_grid.shape}')
     LOGGER.info(f'created pos_grid {pos_grid.shape}')
 
-    # restrict the fitting area of the detector to smoothen out contributions from edge spots
-
+    # create the sample
     sample_trials = polycrystalline_sample(deepcopy(conf), hkl_sign_redundancy=True, rotation_type='mrp', restrict_fitting_area=True)
     sample_trials.set_tensor_variables(rot_grid, pos_grid)
 
@@ -325,16 +255,16 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
                                                                                                   n_ang=len(sample_trials.Gamma),
                                                                                                   n_hkl=len(sample_trials.v[...,0]),
                                                                                                   n_det=len(sample_trials.dt))
-    
-    # run search
+
+    # find neighbours params and run configuration
     max_nn_dist, _ = get_neighbour_stats(sample_trials, 
                                          inds_trials=(i_grn_trials, i_ang_trials, i_det_trials), 
                                          lookup_data=(nn_lookup_ind, lookup_pixel_size, lookup_n_pix), 
                                          s_target=s_obs)
     n_iter, control_params = get_single_optimization_control_params(conf, max_nn_dist)
-    
     LOGGER.info(f'running optimization {opt_fun} with n_steps_annealing={n_iter} batch_size={batch_size}')
 
+    # run analysis
     time_start = time.time()
     a_fit, x_fit, loss, nspot, fracin = laue_math_graph.batch_optimize_grain(n_per_batch=batch_size,
                                                                              s_target=s_obs,
@@ -346,13 +276,13 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
                                                                              n_iter=n_iter,
                                                                              control_params=control_params)
 
+    # process output
     a_fit = Rotation.from_matrix(a_fit.numpy()).as_mrp()
     time_elapsed = time.time() - time_start
     LOGGER.info(f'finished fitting {n_trials} trials')
     LOGGER.info(f'time taken {time_elapsed:2.2f} sec, time per trial {time_elapsed/len(pos_grid):2.6f} sec')
 
     # store output
-
     dict_out = dict(x_tru=base_x,
                     x_est=x_fit,
                     a_tru=base_a,
@@ -364,22 +294,18 @@ def analyse(n_grid,conf, mpd, index=0, test=False):
                     pos_grid=pos_grid,
                     time_elapsed=time_elapsed)
 
+    # for zero-index, also store additional variables
     if index==0:
         dict_out.update(dict(s_lab_noisy=s_obs,
                              s_lab=s_obs,
                              i_det_obs=i_det_obs,
                              i_ang_obs=i_ang_obs,
-                             i_grn_tru=i_grn_sample,
-                             i_ang_tru=i_ang_sample,
-                             i_det_tru=i_det_sample,
-                             i_hkl_tru=i_hkl_sample,
-                             i_all_tru=i_all_sample,
                              nn_lookup_ind=nn_lookup_ind,
                              lookup_pixel_size=lookup_pixel_size,
                              lookup_n_pix=lookup_n_pix,
-                             sig_s=sig_s,
-                             frac_outliers=frac_outliers))
+                             sig_s=sig_s))
 
+    # output
     return dict_out
 
 
@@ -649,6 +575,74 @@ def sparse_matrix_to_dict(data, prefix):
 
     return out
 
+def get_detectors_from_config(conf):
+
+    detectors = []
+    for d in conf['detectors']:
+        det = Detector(detector_type=d['type'],
+                       detector_id=d['id'],
+                       side_length=d['side_length'],
+                       num_pixels=d['num_pixels'],
+                       position=d['position'],
+                       tilt=d['tilt'],
+                       tol_position=d['position_err'],
+                       tol_tilt=d['tilt_err'])
+        detectors.append(det)
+    
+    return detectors
+
+def get_peaskdata_from_config(conf, beamline):
+
+    from laueotx.peaks_data import PeaksData, MultidetectorPeaksData
+
+    omegas = utils_config.get_angles(conf['angles'])
+
+    list_pd = []
+    for peaks in conf['data']['peaks']:
+
+        fpath = peaks['filepath'] if os.path.isabs(peaks['filepath']) else os.path.join(conf['data']['path_root'], peaks['filepath'])
+
+        pd = PeaksData(detector_type=peaks['detector'],
+                        beamline=beamline,
+                        filepath=fpath,
+                        apply_coord_shift=peaks['apply_coord_shift'],
+                        flip_x_coord=peaks['flip_x_coord'],
+                        omegas_use=omegas)
+        list_pd.append(pd)
+
+    mpd = MultidetectorPeaksData(list_pd, beamline=beamline)
+
+    return mpd
+
+
+
+def get_indices(tasks):
+    """
+    Parses the jobids from the tasks string.
+
+    :param tasks: The task string, which will get parsed into the job indices
+    :return: A list of the jobids that should be executed
+    """
+    # parsing a list of indices from the tasks argument
+
+    if '>' in tasks:
+        tasks = tasks.split('>')
+        start = tasks[0].replace(' ', '')
+        stop = tasks[1].replace(' ', '')
+        indices = list(range(int(start), int(stop)))
+    elif ',' in tasks:
+        indices = tasks.split(',')
+        indices = list(map(int, indices))
+    else:
+        try:
+            indices = [int(tasks)]
+        except ValueError:
+            raise ValueError("Tasks argument is not in the correct format!")
+
+    return indices
+
+
+
 
 def get_experimental_sample_params(conf):
 
@@ -750,278 +744,296 @@ def get_experimental_sample_params(conf):
     return base_a, base_x, max_grain_pos, max_grain_rot
 
 
-def fenimn_calibration(indices, output_dir, conf):
+# def fenimn_calibration(indices, output_dir, conf):
 
-    LOGGER.critical('running fenimn sample calibration')
+#     LOGGER.critical('running fenimn sample calibration')
     
-    grid_shift = np.linspace(-10,10,11)
-    n_det = 2
-    dir_out_root = output_dir
+#     grid_shift = np.linspace(-10,10,11)
+#     n_det = 2
+#     dir_out_root = output_dir
 
-    for index in indices:
-        conf = conf.copy()
-        # conf = utils_io.read_config(args)
+#     for index in indices:
+#         conf = conf.copy()
+#         # conf = utils_io.read_config(args)
 
-        # get detector shift
+#         # get detector shift
 
-        id_det = index % n_det
-        id_shift = index // n_det
-        id_det_remove = 0 if id_det==1 else 1
+#         id_det = index % n_det
+#         id_shift = index // n_det
+#         id_det_remove = 0 if id_det==1 else 1
 
-        del(conf['detectors'][id_det_remove])
-        del(conf['data']['peaks'][id_det_remove])
+#         del(conf['detectors'][id_det_remove])
+#         del(conf['data']['peaks'][id_det_remove])
 
-        conf['detectors'][0]['position'][0] += grid_shift[id_shift]
+#         conf['detectors'][0]['position'][0] += grid_shift[id_shift]
 
-        LOGGER.info(f'=================> running on index {index} / {str(len(indices))} id_det={id_det} id_shift={id_shift}')
-        LOGGER.info(f"shifted detector {id_det} {conf['detectors'][0]['position']}")
+#         LOGGER.info(f'=================> running on index {index} / {str(len(indices))} id_det={id_det} id_shift={id_shift}')
+#         LOGGER.info(f"shifted detector {id_det} {conf['detectors'][0]['position']}")
 
-        # get measurements
+#         # get measurements
 
-        omegas = utils_config.get_angles(conf['angles'])
-        LOGGER.info(f'got {len(omegas)} angles')
+#         omegas = utils_config.get_angles(conf['angles'])
+#         LOGGER.info(f'got {len(omegas)} angles')
 
-        dt = get_detectors_from_config(conf)
+#         dt = get_detectors_from_config(conf)
 
-        bl = Beamline(omegas=omegas, 
-                      detectors=dt,
-                      lambda_lim=[conf['beam']['lambda_min'], conf['beam']['lambda_max']])
+#         bl = Beamline(omegas=omegas, 
+#                       detectors=dt,
+#                       lambda_lim=[conf['beam']['lambda_min'], conf['beam']['lambda_max']])
 
-        mpd = get_peaskdata_from_config(conf, bl)
+#         mpd = get_peaskdata_from_config(conf, bl)
 
-        # get output dir
+#         # get output dir
 
-        current_output_dir = os.path.join(dir_out_root, f"det{id_det}_shift{id_shift:02d}")
-        utils_io.robust_makedirs(current_output_dir)
+#         current_output_dir = os.path.join(dir_out_root, f"det{id_det}_shift{id_shift:02d}")
+#         utils_io.robust_makedirs(current_output_dir)
 
-        # main magic
+#         # main magic
 
-        dict_out = analyse(n_grid, conf, mpd, index=0, test=False)
-        multigrain(indices=[0], args=args, dict_merged=dict_out)
-
-
-
-def coniga_calibration(indices, n_grid, conf):
-
-    from laueotx import laue_coordinate_descent, utils_inversion
-    from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, select_indices
-    from laueotx.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup, nn_distance
-
-    # conf = utils_io.read_config(args)
-    conf = conf.copy()
-
-    omegas = utils_config.get_angles(conf['angles'])
-    LOGGER.info(f'got {len(omegas)} angles')
-
-    dt = get_detectors_from_config(conf)
-
-    bl = Beamline(omegas=omegas, 
-                  detectors=dt,
-                  lambda_lim=[conf['beam']['lambda_min'], conf['beam']['lambda_max']])
+#         dict_out = analyse(n_grid, conf, mpd, index=0, test=False)
+#         multigrain(indices=[0], args=args, dict_merged=dict_out)
 
 
-    mpd = get_peaskdata_from_config(conf, bl)
 
-    s_obs = np.array(mpd.to_lab_coords())
-    s_obs[:,0] = 0
-    i_det_obs = np.array(mpd.peaks['id_detector']).reshape(-1,1)
-    i_ang_obs = np.array(mpd.peaks['id_angle']).reshape(-1,1)
+# def coniga_calibration(indices, n_grid, conf):
 
-    base_a_all, base_x_all, max_grain_pos, max_grain_rot = get_experimental_sample_params(conf)
+#     from laueotx import laue_coordinate_descent, utils_inversion
+#     from laueotx.polycrystalline_sample import polycrystalline_sample, get_batch_indices_full, select_indices
+#     from laueotx.spot_neighbor_lookup import spot_neighbor_lookup, nn_lookup, nn_distance
 
-    # get lookup
+#     # conf = utils_io.read_config(args)
+#     conf = conf.copy()
 
-    snl = spot_neighbor_lookup(conf=conf, 
-                               s_spot=s_obs, 
-                               i_ang=i_ang_obs, 
-                               i_det=i_det_obs, 
-                               lookup_n_pix=int(conf['solver']['lookup_n_pix']), # pix, 
-                               detector_side_length=conf['detectors'][0]['side_length'], 
-                               n_neighbours=int(conf['solver']['n_neighbours']))
-    nn_lookup_ind = tf.constant(snl.nn_lookup_ind.numpy(), dtype=tf.int32)
-    lookup_pixel_size=snl.detector_side_length/snl.lookup_n_pix
-    lookup_n_pix=snl.lookup_n_pix
+#     omegas = utils_config.get_angles(conf['angles'])
+#     LOGGER.info(f'got {len(omegas)} angles')
+
+#     dt = get_detectors_from_config(conf)
+
+#     bl = Beamline(omegas=omegas, 
+#                   detectors=dt,
+#                   lambda_lim=[conf['beam']['lambda_min'], conf['beam']['lambda_max']])
 
 
-    for gi in indices:
+#     mpd = get_peaskdata_from_config(conf, bl)
 
-        LOGGER.info(f'=================== grain {gi}')
+#     s_obs = np.array(mpd.to_lab_coords())
+#     s_obs[:,0] = 0
+#     i_det_obs = np.array(mpd.peaks['id_detector']).reshape(-1,1)
+#     i_ang_obs = np.array(mpd.peaks['id_angle']).reshape(-1,1)
 
-        base_a = base_a_all[[gi]]
-        base_x = base_x_all[[gi]]
+#     base_a_all, base_x_all, max_grain_pos, max_grain_rot = get_experimental_sample_params(conf)
 
-        n_grains_obs = len(base_a)
+#     # get lookup
 
-        # get search grid
+#     snl = spot_neighbor_lookup(conf=conf, 
+#                                s_spot=s_obs, 
+#                                i_ang=i_ang_obs, 
+#                                i_det=i_det_obs, 
+#                                lookup_n_pix=int(conf['solver']['lookup_n_pix']), # pix, 
+#                                detector_side_length=conf['detectors'][0]['side_length'], 
+#                                n_neighbours=int(conf['solver']['n_neighbours']))
+#     nn_lookup_ind = tf.constant(snl.nn_lookup_ind.numpy(), dtype=tf.int32)
+#     lookup_pixel_size=snl.detector_side_length/snl.lookup_n_pix
+#     lookup_n_pix=snl.lookup_n_pix
 
-        max_rms_inlier = 20
-        n_trials = int(n_grid)
-        max_detector_delta_rot = 0.01
-        max_detector_delta_pos = 10
-        max_grain_delta_rot = 0.01 
-        max_grain_delta_pos = 3
-        sobol_samples = tf.math.sobol_sample(dim=18, num_results=n_trials, skip=0, dtype=tf.float64).numpy()*2 -1 # numbers between -1 and 1
-        dr_grid_det0 = sobol_samples[:,0:3]  * max_detector_delta_rot
-        dr_grid_det1 = sobol_samples[:,3:6]  * max_detector_delta_rot
-        dx_grid_det0 = sobol_samples[:,6:9]  * max_detector_delta_pos
-        dx_grid_det1 = sobol_samples[:,9:12] * max_detector_delta_pos
-        dr_grid = np.concatenate([np.expand_dims(dr_grid_det0, axis=1),np.expand_dims(dr_grid_det1, axis=1)], axis=1)
-        dx_grid = np.concatenate([np.expand_dims(dx_grid_det0, axis=1),np.expand_dims(dx_grid_det1, axis=1)], axis=1)
-        dr_grid[0,...] = 0
-        dx_grid[0,...] = 0
-        dx_grid[:,0,0] -= 160
-        dx_grid[:,1,0] += 160
 
-        gr_grid = sobol_samples[:,12:15] * max_grain_delta_rot
-        gx_grid = sobol_samples[:,15:18] * max_grain_delta_pos
-        gr_grid = base_a + gr_grid
-        gx_grid = base_x + gx_grid
-        gr_grid[0] = 0
-        gx_grid[0] = 0
+#     for gi in indices:
 
-        loss = np.ones([n_trials])*1e6
+#         LOGGER.info(f'=================== grain {gi}')
 
-        n_trials_per_batch = 1
-        n_batches = n_trials//n_trials_per_batch
-        sample = polycrystalline_sample(conf, hkl_sign_redundancy=True, rotation_type='mrp', restrict_fitting_area=True)
-        sample.set_tensor_variables(rot=gr_grid[:n_trials_per_batch], pos=gx_grid[:n_trials_per_batch], dr=dr_grid[:n_trials_per_batch], d0=dx_grid[:n_trials_per_batch]) # this is just so the next line runs
-        i_grn, i_ang, i_hkl, i_det, i_all = sample.get_batch_indices_full(n_grn=n_trials_per_batch)
-        for j in LOGGER.progressbar(range(n_batches), at_level='info'):
+#         base_a = base_a_all[[gi]]
+#         base_x = base_x_all[[gi]]
 
-            si, ei = j*n_trials_per_batch, (j+1)*n_trials_per_batch
+#         n_grains_obs = len(base_a)
 
-            sample.set_tensor_variables(rot=gr_grid[si:ei], pos=gx_grid[si:ei], dr=dr_grid[si:ei], d0=dx_grid[si:ei])
-            s_lab, p_sample, p_lam, select_sample = sample.get_spots_batch(reference_frame='detector', n_per_batch=n_trials_per_batch)
+#         # get search grid
 
-            s_sample, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample = select_indices(select_sample, s_lab, i_grn, i_ang, i_hkl, i_det, i_all)
-            i_nn = nn_lookup(nn_lookup_ind, s_obs, s_sample, i_ang_sample, i_det_sample, i_grn_sample, lookup_pixel_size, lookup_n_pix)
-            s_target = tf.gather(s_obs, i_nn)
+#         max_rms_inlier = 20
+#         n_trials = int(n_grid)
+#         max_detector_delta_rot = 0.01
+#         max_detector_delta_pos = 10
+#         max_grain_delta_rot = 0.01 
+#         max_grain_delta_pos = 3
+#         sobol_samples = tf.math.sobol_sample(dim=18, num_results=n_trials, skip=0, dtype=tf.float64).numpy()*2 -1 # numbers between -1 and 1
+#         dr_grid_det0 = sobol_samples[:,0:3]  * max_detector_delta_rot
+#         dr_grid_det1 = sobol_samples[:,3:6]  * max_detector_delta_rot
+#         dx_grid_det0 = sobol_samples[:,6:9]  * max_detector_delta_pos
+#         dx_grid_det1 = sobol_samples[:,9:12] * max_detector_delta_pos
+#         dr_grid = np.concatenate([np.expand_dims(dr_grid_det0, axis=1),np.expand_dims(dr_grid_det1, axis=1)], axis=1)
+#         dx_grid = np.concatenate([np.expand_dims(dx_grid_det0, axis=1),np.expand_dims(dx_grid_det1, axis=1)], axis=1)
+#         dr_grid[0,...] = 0
+#         dx_grid[0,...] = 0
+#         dx_grid[:,0,0] -= 160
+#         dx_grid[:,1,0] += 160
 
-            # remove stuff that went outside the screen
+#         gr_grid = sobol_samples[:,12:15] * max_grain_delta_rot
+#         gx_grid = sobol_samples[:,15:18] * max_grain_delta_pos
+#         gr_grid = base_a + gr_grid
+#         gx_grid = base_x + gx_grid
+#         gr_grid[0] = 0
+#         gx_grid[0] = 0
 
-            i_ang_target = tf.gather(i_ang_obs, i_nn)
-            select_ok = np.array(i_ang_target)==np.array(i_ang_sample)
+#         loss = np.ones([n_trials])*1e6
 
-            s_sample, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample = select_indices(select_ok[:,0], s_sample, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample)
-            i_nn = nn_lookup(nn_lookup_ind, s_obs, s_sample, i_ang_sample, i_det_sample, i_grn_sample, lookup_pixel_size, lookup_n_pix)
-            s_target = tf.gather(s_obs, i_nn)
-            l2 = np.sqrt(tf.reduce_sum((s_sample-s_target)**2, axis=1))
+#         n_trials_per_batch = 1
+#         n_batches = n_trials//n_trials_per_batch
+#         sample = polycrystalline_sample(conf, hkl_sign_redundancy=True, rotation_type='mrp', restrict_fitting_area=True)
+#         sample.set_tensor_variables(rot=gr_grid[:n_trials_per_batch], pos=gx_grid[:n_trials_per_batch], dr=dr_grid[:n_trials_per_batch], d0=dx_grid[:n_trials_per_batch]) # this is just so the next line runs
+#         i_grn, i_ang, i_hkl, i_det, i_all = sample.get_batch_indices_full(n_grn=n_trials_per_batch)
+#         for j in LOGGER.progressbar(range(n_batches), at_level='info'):
 
-            # assert np.all(select_ok), f'bound errors in lookup {np.count_nonzero(select_ok)}/{len(select_ok)}'
+#             si, ei = j*n_trials_per_batch, (j+1)*n_trials_per_batch
 
-            select0 = i_det_sample==0
-            select1 = i_det_sample==1
+#             sample.set_tensor_variables(rot=gr_grid[si:ei], pos=gx_grid[si:ei], dr=dr_grid[si:ei], d0=dx_grid[si:ei])
+#             s_lab, p_sample, p_lam, select_sample = sample.get_spots_batch(reference_frame='detector', n_per_batch=n_trials_per_batch)
 
-            from scipy.stats import sigmaclip
-            clipped, clip_lower, clip_upper0 = sigmaclip(l2[select0[:,0]], low=100, high=2)
-            clipped, clip_lower, clip_upper1 = sigmaclip(l2[select1[:,0]], low=100, high=2)
-            select_inliers = ((l2<clip_upper0) & select0[:,0]) | ((l2<clip_upper1) & select1[:,0])
+#             s_sample, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample = select_indices(select_sample, s_lab, i_grn, i_ang, i_hkl, i_det, i_all)
+#             i_nn = nn_lookup(nn_lookup_ind, s_obs, s_sample, i_ang_sample, i_det_sample, i_grn_sample, lookup_pixel_size, lookup_n_pix)
+#             s_target = tf.gather(s_obs, i_nn)
 
-            l2_seg = tf.math.segment_mean(l2[select_inliers], np.array(i_grn_sample)[select_inliers,0])
-            loss[si:ei] = l2_seg
+#             # remove stuff that went outside the screen
+
+#             i_ang_target = tf.gather(i_ang_obs, i_nn)
+#             select_ok = np.array(i_ang_target)==np.array(i_ang_sample)
+
+#             s_sample, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample = select_indices(select_ok[:,0], s_sample, i_grn_sample, i_ang_sample, i_hkl_sample, i_det_sample, i_all_sample)
+#             i_nn = nn_lookup(nn_lookup_ind, s_obs, s_sample, i_ang_sample, i_det_sample, i_grn_sample, lookup_pixel_size, lookup_n_pix)
+#             s_target = tf.gather(s_obs, i_nn)
+#             l2 = np.sqrt(tf.reduce_sum((s_sample-s_target)**2, axis=1))
+
+#             # assert np.all(select_ok), f'bound errors in lookup {np.count_nonzero(select_ok)}/{len(select_ok)}'
+
+#             select0 = i_det_sample==0
+#             select1 = i_det_sample==1
+
+#             from scipy.stats import sigmaclip
+#             clipped, clip_lower, clip_upper0 = sigmaclip(l2[select0[:,0]], low=100, high=2)
+#             clipped, clip_lower, clip_upper1 = sigmaclip(l2[select1[:,0]], low=100, high=2)
+#             select_inliers = ((l2<clip_upper0) & select0[:,0]) | ((l2<clip_upper1) & select1[:,0])
+
+#             l2_seg = tf.math.segment_mean(l2[select_inliers], np.array(i_grn_sample)[select_inliers,0])
+#             loss[si:ei] = l2_seg
             
-            LOGGER.debug(f'batch {j:>6d}/{n_batches} best_loss={astr3(np.min(l2_seg)):>10s} n_ok={astr3(np.count_nonzero(select_ok)/len(select_ok)):>6s} selected inliers {astr3(np.count_nonzero(select_inliers)/len(select_inliers)):>6s} clip_upper_l2={astr3([clip_upper0, clip_upper1])}')
+#             LOGGER.debug(f'batch {j:>6d}/{n_batches} best_loss={astr3(np.min(l2_seg)):>10s} n_ok={astr3(np.count_nonzero(select_ok)/len(select_ok)):>6s} selected inliers {astr3(np.count_nonzero(select_inliers)/len(select_inliers)):>6s} clip_upper_l2={astr3([clip_upper0, clip_upper1])}')
 
 
 
-        best_id = np.argmin(loss)
-        LOGGER.critical(f'===============> grain {gi} {loss[0]} -> {loss[best_id]}')
-        LOGGER.critical(f'gx{i}={astr(gx_grid[best_id])} {astr(base_x)}')
-        LOGGER.critical(f'gr{i}={astr(gr_grid[best_id])} {astr(base_a)}')
+#         best_id = np.argmin(loss)
+#         LOGGER.critical(f'===============> grain {gi} {loss[0]} -> {loss[best_id]}')
+#         LOGGER.critical(f'gx{i}={astr(gx_grid[best_id])} {astr(base_x)}')
+#         LOGGER.critical(f'gr{i}={astr(gr_grid[best_id])} {astr(base_a)}')
         
-        for i in range(n_detectors):
-            LOGGER.critical(f'calibration detector {i}:')
-            LOGGER.critical(f'dx{i}={astr(dx_grid[best_id,i])}')
-            LOGGER.critical(f'dr{i}={astr(dr_grid[best_id,i])}')
+#         for i in range(n_detectors):
+#             LOGGER.critical(f'calibration detector {i}:')
+#             LOGGER.critical(f'dx{i}={astr(dx_grid[best_id,i])}')
+#             LOGGER.critical(f'dr{i}={astr(dr_grid[best_id,i])}')
 
-        utils_io.write_arrays(f'coniga_calibr_{gi}.h5', 'w', gx_grid=gx_grid, gr_grid=gr_grid, dx_grid=dx_grid, dr_grid=dr_grid, loss=loss)
-
-
+#         utils_io.write_arrays(f'coniga_calibr_{gi}.h5', 'w', gx_grid=gx_grid, gr_grid=gr_grid, dx_grid=dx_grid, dr_grid=dr_grid, loss=loss)
 
 
-def get_detectors_from_config(conf):
 
-    detectors = []
-    for d in conf['detectors']:
-        det = Detector(detector_type=d['type'],
-                       detector_id=d['id'],
-                       side_length=d['side_length'],
-                       num_pixels=d['num_pixels'],
-                       position=d['position'],
-                       tilt=d['tilt'],
-                       tol_position=d['position_err'],
-                       tol_tilt=d['tilt_err'])
-        detectors.append(det)
+
+
+
+
+# import functools
+# def common_options(f):
+#     @click.option('--conf', "-c", required=True, type=click.File(), show_default=True,help='Configuration yaml file')
+#     @click.option('output_dir','--output-dir', "-o", required=True, type=click.Path(), show_default=True,help='Directory to store the produced files')
+#     @click.option('--n-grid', default=2000, show_default=True,help='number of grid points from which to initialize coordinate descent')
+#     @click.option("--calibrate-coniga/--no-calibrate-coninga",default=False, help="Calibrate the coniga sample")
+#     @click.option("--calibrate-fenimn/--no-calibrate-fenimn", default=False, help="Calibrate the fenimn sample")
+#     @functools.wraps(f)
+#     def wrapper_common_options(*args, **kwargs):
+#         return f(*args, **kwargs)
+
+#     return wrapper_common_options
+
+# if __name__ == '__main__':
+#     pass
+
+
+
+
+
+
+# def resources(args):
+
+#     import argparse
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('--queue', type=str, default='gwen_short', choices=('gwen_short', 'gwen', 'gpu'))
+#     argk, _ = parser.parse_known_args(args)
     
-    return detectors
+#     res = dict(main_memory=4000,
+#                main_time_per_index=1, # hours
+#                main_nproc=4,
+#                main_scratch=6500,
+#                main_ngpu=1,
+#                merge_ngpu=2,
+#                merge_time=1) # hours
 
-def get_peaskdata_from_config(conf, beamline):
+#     if argk.queue == 'gwen_short':
 
-    from laueotx.peaks_data import PeaksData, MultidetectorPeaksData
+#         res['main_time_per_index']=2 # hours
+#         res['main_ngpu']=1
+#         res['main_nproc']=16*res['main_ngpu']
+#         res['main_memory']=3900*res['main_nproc']
+#         res['pass'] = {'cluster':'gmerlin6', 'account':'gwendolen', 'partition':'gwendolen', 'gpus-per-task':res['main_ngpu'], 'cpus-per-gpu':16}
+#         res['main_nsimult'] = 5
+#         res['merge_ngpu']=1
+#         res['merge_nproc']=16*res['main_ngpu']
+#         res['merge_memory']=3900*res['main_nproc']
 
-    omegas = utils_config.get_angles(conf['angles'])
+#     elif argk.queue == 'gwen':
 
-    list_pd = []
-    for peaks in conf['data']['peaks']:
+#         res['main_time_per_index']=8 # hours
+#         res['main_ngpu']=4
+#         res['main_nproc']=16*res['main_ngpu']
+#         res['main_memory']=3900*res['main_nproc']
+#         res['pass'] = {'cluster':'gmerlin6', 'account':'gwendolen', 'partition':'gwendolen-long', 'gpus-per-task':res['main_ngpu'], 'cpus-per-gpu':16}
 
-        fpath = peaks['filepath'] if os.path.isabs(peaks['filepath']) else os.path.join(conf['data']['path_root'], peaks['filepath'])
+#     elif argk.queue == 'gpu':
 
-        pd = PeaksData(detector_type=peaks['detector'],
-                        beamline=beamline,
-                        filepath=fpath,
-                        apply_coord_shift=peaks['apply_coord_shift'],
-                        flip_x_coord=peaks['flip_x_coord'],
-                        omegas_use=omegas)
-        list_pd.append(pd)
-
-    mpd = MultidetectorPeaksData(list_pd, beamline=beamline)
-
-    return mpd
-
-
-
-def get_indices(tasks):
-    """
-    Parses the jobids from the tasks string.
-
-    :param tasks: The task string, which will get parsed into the job indices
-    :return: A list of the jobids that should be executed
-    """
-    # parsing a list of indices from the tasks argument
-
-    if '>' in tasks:
-        tasks = tasks.split('>')
-        start = tasks[0].replace(' ', '')
-        stop = tasks[1].replace(' ', '')
-        indices = list(range(int(start), int(stop)))
-    elif ',' in tasks:
-        indices = tasks.split(',')
-        indices = list(map(int, indices))
-    else:
-        try:
-            indices = [int(tasks)]
-        except ValueError:
-            raise ValueError("Tasks argument is not in the correct format!")
-
-    return indices
+#         res['main_time_per_index']=24 # hours
+#         res['main_ngpu']=1
+#         res['main_nproc']=4
+#         res['main_memory']=4000*res['main_nproc']
+#         res['pass'] = {'cluster':'gmerlin6', 'partition':'gpu', 'gpus-per-task':res['main_ngpu'], 'cpus-per-gpu':4}
 
 
-
-import functools
-def common_options(f):
-    @click.option('--conf', "-c", required=True, type=click.File(), show_default=True,help='Configuration yaml file')
-    @click.option('output_dir','--output-dir', "-o", required=True, type=click.Path(), show_default=True,help='Directory to store the produced files')
-    @click.option('--n-grid', default=2000, show_default=True,help='number of grid points from which to initialize coordinate descent')
-    @click.option("--calibrate-coniga/--no-calibrate-coninga",default=False, help="Calibrate the coniga sample")
-    @click.option("--calibrate-fenimn/--no-calibrate-fenimn", default=False, help="Calibrate the fenimn sample")
-    @functools.wraps(f)
-    def wrapper_common_options(*args, **kwargs):
-        return f(*args, **kwargs)
-
-    return wrapper_common_options
-
-if __name__ == '__main__':
-    pass
+#     return res
 
 
+# def setup(args):
+
+#     if type(args) is not list: 
+#         return args
+
+#     description = 'Run compression benchmarks for climate simulations'
+#     parser = argparse.ArgumentParser(description=description, add_help=True)
+#     parser.add_argument('-v', '--verbosity', type=str, default='info', choices=('critical', 'error', 'warning', 'info', 'debug'), 
+#                         help='logging level')
+#     parser.add_argument('--conf', type=str, required=True, 
+#                         help='configuration yaml file')
+#     parser.add_argument('--dir_out', type=str, required=True, 
+#                         help='output dir')
+#     parser.add_argument('--params_ot', type=str, default=None,
+#                         help='parameters for the OT, string will be parsed, format: --params_ot=key1=value1,key2=value2')
+#     parser.add_argument('--test', action='store_true',
+#                         help='test mode')
+#     parser.add_argument('--n_grid', type=int, default=2000,
+#                         help='number of grid points from which to initialize coordinate descent')
+#     parser.add_argument('--calibrate_coniga', action='store_true',
+#                         help='if to calibrate the coniga sample')
+#     parser.add_argument('--calibrate_fenimn', action='store_true',
+#                         help='if to calibrate the fenimn sample')
+
+#     args, _ = parser.parse_known_args(args)
+#     utils_logging.set_all_loggers_level(args.verbosity)
+    
+#     args.conf = utils_io.get_abs_path(args.conf)
+#     args.dir_out = utils_io.get_abs_path(args.dir_out)
+#     utils_io.robust_makedirs(args.dir_out)
+
+#     return args
 

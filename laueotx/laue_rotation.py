@@ -4,8 +4,29 @@ import tensorflow as tf
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial.transform import Rotation as Rotation_spatial
 
+def get_max_rf(laue_group):
+    """Get maximum rotation value allowed for a rotation group, in Rodrigues-Frank parameters (not MRP).
+    
+    Parameters
+    ----------
+    laue_group : str
+        Laue group description. Currently available = ['c']
+    
+    Returns
+    -------
+    Float
+        Maximum allowed value of the rotation vector.
+    """
+    if laue_group.lower() == 'c':
+
+        max_r = 0.414
+
+    return max_r
+
+
+
 def get_rotation_constraint_rf(r, laue_group='c'):
-    """ remove rotations that are outside the constraint
+    """Find rotation that satisfy the constraint for a given Laue group.
     Youliang Hea and John J. Jonas, 2007, Representation of orientation relationships in Rodrigues–Frank space for any two classes of lattice
     
     Parameters
@@ -20,10 +41,11 @@ def get_rotation_constraint_rf(r, laue_group='c'):
     TYPE
         Description
     """
+    
+    max_r = get_max_rf(laue_group)
 
     if laue_group.lower() == 'c':
 
-        max_r = 0.414
         max_r_norm = np.linalg.norm([max_r, max_r, max_r/2], ord=1)
         r_norm = np.linalg.norm(r, ord=1, axis=1)
         select = (r_norm<max_r_norm) & np.all(np.abs(r)<max_r, axis=1)

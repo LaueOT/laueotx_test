@@ -6,12 +6,10 @@ Perform single-grain fitting on part (or full) initialization grid.
 
 ## Parameters
 
-| Name               | Type                | Description                                                      | Default    |
-|--------------------|---------------------|------------------------------------------------------------------|------------|
-| `conf`             | str \| pathlib.Path | Path to the configuration file                                   | _required_ |
-| `output_dir`       | str                 | Path to the output directory to store the (intermediate) results | _required_ |
-| `verbosity`        | bool                | Verbosity level for printing to console                          | _required_ |
-| `n_grid`           | int                 | _description_                                                    | _required_ |
-| `calibrate_coniga` | bool                | _description_                                                    | _required_ |
-| `calibrate_fenimn` | bool                | _description_                                                    | _required_ |
-| `tasks`            | list                | _description_                                                    | _required_ |
+| Name         | Type                | Description                                                                                                                                                                                                   | Default    |
+|--------------|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `conf`       | str \| pathlib.Path | Path to the configuration file                                                                                                                                                                                | _required_ |
+| `output_dir` | str                 | Path to the output directory to store the (intermediate) results                                                                                                                                              | _required_ |
+| `verbosity`  | bool                | Verbosity level for printing to console                                                                                                                                                                       | _required_ |
+| `n_grid`     | int                 | Number of single-grain initialial guesses per task. They will be distributed using a Sobol sequence inside the grain position and orientation space.                                                          | _required_ |
+| `tasks`      | list                | List of integer task ids to use. Each task will compute n_grid single-grain fitting solutions. The starting points will be created using Sobol points with indices (task_id * n_grid):((task_id+1) * n_grid). | _required_ |
