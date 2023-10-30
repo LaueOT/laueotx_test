@@ -54,4 +54,5 @@ quartodoc:
         # you can refer to anything: class methods, modules, etc..
         # - name: realdata
         #   children: linked
-        - realdata.compute
+        - realdata.singlegrain
+        - realdata.multigrain

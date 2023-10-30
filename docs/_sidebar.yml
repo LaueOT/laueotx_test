@@ -3,7 +3,8 @@ website:
   - contents:
     - reference/index.qmd
     - contents:
-      - reference/realdata.compute.qmd
+      - reference/realdata.singlegrain.qmd
+      - reference/realdata.multigrain.qmd
       section: Application functions
     id: reference
   - id: dummy-sidebar

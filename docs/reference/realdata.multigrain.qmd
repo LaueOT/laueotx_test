@@ -1,0 +1,22 @@
+# realdata.multigrain { #laueotx.realdata.multigrain }
+
+`realdata.multigrain(conf, output_dir, verbosity, n_grid, calibrate_coniga, calibrate_fenimn, tasks, test=False, dict_merged=None)`
+
+Perform multi-grain fitting with Optimal Transport. 
+This function performs the following steps:
+
+    1. collect and merges results from parallelized single-grain fitting runs
+    2. perform prototype selection using OT framework
+    3. perform multi-grain fitting with OT
+
+The optput is a file .h5 with datasets.
+
+## Parameters
+
+| Name         | Type                | Description                                                                    | Default    |
+|--------------|---------------------|--------------------------------------------------------------------------------|------------|
+| `conf`       | str \| pathlib.Path | Path to the configuration file                                                 | _required_ |
+| `output_dir` | str                 | Path to the output directory where the single-grain fitting results are stored | _required_ |
+| `verbosity`  | bool                | Verbosity level for printing to console                                        | _required_ |
+| `n_grid`     | int                 | _description_                                                                  | _required_ |
+| `tasks`      | list                | _description_                                                                  | _required_ |
