@@ -186,13 +186,13 @@
     "href": "reference/realdata.singlegrain.html",
     "title": "realdata.singlegrain",
     "section": "",
-    "text": "realdata.singlegrain(conf, output_dir, verbosity, n_grid, tasks)\nPerform single-grain fitting on part (or full) initialization grid.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory to store the (intermediate) results\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\ndescription\nrequired\n\n\ncalibrate_coniga\nbool\ndescription\nrequired\n\n\ncalibrate_fenimn\nbool\ndescription\nrequired\n\n\ntasks\nlist\ndescription\nrequired"
+    "text": "realdata.singlegrain(conf, output_dir, verbosity, n_grid, tasks)\nPerform single-grain fitting on part (or full) initialization grid.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory to store the (intermediate) results\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\nNumber of single-grain initialial guesses per task. They will be distributed using a Sobol sequence inside the grain position and orientation space.\nrequired\n\n\ntasks\nlist\nList of integer task ids to use. Each task will compute n_grid single-grain fitting solutions. The starting points will be created using Sobol points with indices (task_id * n_grid):((task_id+1) * n_grid).\nrequired"
   },
   {
     "objectID": "reference/realdata.singlegrain.html#parameters",
     "href": "reference/realdata.singlegrain.html#parameters",
     "title": "realdata.singlegrain",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory to store the (intermediate) results\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\ndescription\nrequired\n\n\ncalibrate_coniga\nbool\ndescription\nrequired\n\n\ncalibrate_fenimn\nbool\ndescription\nrequired\n\n\ntasks\nlist\ndescription\nrequired"
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nconf\nstr | pathlib.Path\nPath to the configuration file\nrequired\n\n\noutput_dir\nstr\nPath to the output directory to store the (intermediate) results\nrequired\n\n\nverbosity\nbool\nVerbosity level for printing to console\nrequired\n\n\nn_grid\nint\nNumber of single-grain initialial guesses per task. They will be distributed using a Sobol sequence inside the grain position and orientation space.\nrequired\n\n\ntasks\nlist\nList of integer task ids to use. Each task will compute n_grid single-grain fitting solutions. The starting points will be created using Sobol points with indices (task_id * n_grid):((task_id+1) * n_grid).\nrequired"
   }
 ]

@@ -197,10 +197,10 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="table">
 <colgroup>
-<col style="width: 16%">
-<col style="width: 17%">
-<col style="width: 55%">
-<col style="width: 10%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 81%">
+<col style="width: 4%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -232,25 +232,13 @@ ul.task-list li input[type="checkbox"] {
 <tr class="even">
 <td><code>n_grid</code></td>
 <td>int</td>
-<td><em>description</em></td>
-<td><em>required</em></td>
-</tr>
-<tr class="odd">
-<td><code>calibrate_coniga</code></td>
-<td>bool</td>
-<td><em>description</em></td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td><code>calibrate_fenimn</code></td>
-<td>bool</td>
-<td><em>description</em></td>
+<td>Number of single-grain initialial guesses per task. They will be distributed using a Sobol sequence inside the grain position and orientation space.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
 <td><code>tasks</code></td>
 <td>list</td>
-<td><em>description</em></td>
+<td>List of integer task ids to use. Each task will compute n_grid single-grain fitting solutions. The starting points will be created using Sobol points with indices (task_id * n_grid):((task_id+1) * n_grid).</td>
 <td><em>required</em></td>
 </tr>
 </tbody>
