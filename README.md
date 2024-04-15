@@ -3,6 +3,11 @@
 LaueOT finds positions and orientations of grains in polycrystalline samples from Bragg's peaks in white-beam tomographic Laue experiments.
 The GPU-based algorithm enables fast analysis of samples with thousands of grains and millions of spots.
 
+## Under development
+
+This page is under development. The fully-functional code and complete documentation will be provided upon acceptance of the paper. 
+In the meantime, see [preprint](https://arxiv.org/abs/2404.06478) for a full description of the method. 
+
 ## What can LaueOT do?
 
 The inputs to LaueOT are: positions of measured Bragg's peaks (often called spots) on the detector screen for each projectsion, experiment parameters (detector dimensions, distances to the sample, etc). 
